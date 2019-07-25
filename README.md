@@ -50,7 +50,7 @@ Take a look [here, H.F.M repositories](https://github.com/hfmrow/) for other use
 ![Keep between.](readME-Pic/keep-btw2.jpg  "Keep between.")  
 
 **Using regular expression to replace pattern.**  
-*In this case, (\i) mean to be case insensitive context, between in parentheses, there is the pattern to find (upper and lower cases), the dot "." mean any single character, and "[[:digit:]]" for any single number "0-9" in posix [character classes](https://www.regular-expressions.info/posixbrackets.html) notation.*  
+*In this case, (\i) mean to be case insensitive context, between parentheses, there is the pattern to find (upper and lower cases), the dot "." mean any single character, and "[[:digit:]]" for any single number "0-9" in posix [character classes](https://www.regular-expressions.info/posixbrackets.html) notation.*  
 ![regular expression](readME-Pic/regex-1.jpg  "regular expression")  
 
  **Substract pattern using posix**[ Character classes](https://www.regular-expressions.info/posixbrackets.html).  
