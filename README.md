@@ -1,5 +1,5 @@
 # Rename Machine
-*This program is designed to rename/cleaning filenames, adding titles (from a list) and provide specific tag insertion and moving files contained in multi directories to a single folder ... lot of option availables (regex, Posix character classes, case sensitive, keep between, extract).*
+*This program is designed to rename/cleaning filenames, adding titles (from a list) and provide specific tag insertion and moving files contained in multi directories to a single folder ... lot of options available (regex, Posix character classes, case sensitive, keep between, extract, titling).*
 
 Take a look [here, H.F.M repositories](https://github.com/hfmrow/) for other useful linux softwares.
 
@@ -18,10 +18,10 @@ Take a look [here, H.F.M repositories](https://github.com/hfmrow/) for other use
 - Remove parts of filename (3 patterns at once).
 - Replace parts of filename (3 patterns at once).
 - Keep between patterns possibility (Case sensitive, posix [Character classes](https://www.regular-expressions.info/posixbrackets.html)).
-- Pattern substraction possibility (Case sensitive, posix [Character classes](https://www.regular-expressions.info/posixbrackets.html)).
+- Pattern subtracting possibility (Case sensitive, posix [Character classes](https://www.regular-expressions.info/posixbrackets.html)).
 - Ability to use regex for removing patterns.
 - Drag and drop capacity available.
-- Add at begin or at end an incrementation.
+- Add at begin or at end an incremental number.
 - Mask for filtering by extensions.
 - Function to preserve extensions.
 - Add titles list to filenames (from an existing list, usefull for series, music albums)
