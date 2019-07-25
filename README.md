@@ -45,20 +45,20 @@ Take a look [here, H.F.M repositories](https://github.com/hfmrow/) for other use
 **The keep between window**  
 ![keep between](readME-Pic/keep-btw1.jpg  "keep between")  
 
-**Keep between.**
+**Keep between.**  
 *Applied using posix [character classes](https://www.regular-expressions.info/posixbrackets.html)  option. By this way, numeric values "00,01,02,03,..." will always matching for replacement or removing.*  
 ![Keep between.](readME-Pic/keep-btw2.jpg  "Keep between.")  
 
-**Using regular expression to replace pattern.**
+**Using regular expression to replace pattern.**  
 *In this case, (\i) mean to be case insensitive context, between in parentheses, there is the pattern to find (upper and lower cases), the dot "." mean any single character, and "[[:digit:]]" for any single number "0-9" in posix [character classes](https://www.regular-expressions.info/posixbrackets.html) notation.*  
 ![regular expression](readME-Pic/regex-1.jpg  "regular expression")  
 
- **Substract pattern using posix**  [Character classes](https://www.regular-expressions.info/posixbrackets.html).
-*Usefull for series or audio files. The (**1** entry) will be internally transformed into ([[:upper:]][[:upper:]][[:upper:]][[:upper:]][[:space:]][[:digit:]][[:digit:]]) full (**2** character classe compliant), using (**3** strinct mode) *  
+ **Substract pattern using posix**[ Character classes](https://www.regular-expressions.info/posixbrackets.html).  
+*Usefull for series or audio files. The (**1** entry) will be internally transformed into ([[:upper:]][[:upper:]][[:upper:]][[:upper:]][[:space:]][[:digit:]][[:digit:]]) full (**2** character classe compliant), using (**3** strinct mode)*  
 ![Substract pattern](readME-Pic/substract-1.jpg  "Substract pattern")  
 
- **Adding Titles to filenames.**
-*On upper left box, you can past titles list (from wikipedia for exemple), At bottom center you have your files, at top right box you got the result. As you can see, before each title you have “**1-**” a number and a dash, you only want to keep the line after the dash. So, you define “Separator” as **-**, the “Field” at **1** and a simple space “Before title”. I have added more entry to see somes possibilities.  *  
+ **Adding Titles to filenames.**  
+ *On upper left box, you can past titles list (from wikipedia for exemple), At bottom center you have your files, at top right box you got the result. As you can see, before each title you have “**1-**” a number and a dash, you only want to keep the line after the dash. So, you define “Separator” as **-**, the “Field” at **1** and a simple space “Before title”. I have added more entry to see somes possibilities.*  
 ![Adding Titles](readME-Pic/title-example.jpg  "Adding Titles")  
 
 ## How to compile
