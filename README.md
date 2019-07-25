@@ -54,7 +54,7 @@ Take a look [here, H.F.M repositories](https://github.com/hfmrow/) for other use
 ![regular expression](readME-Pic/regex-1.jpg  "regular expression")  
 
  **Substract pattern using posix**[ Character classes](https://www.regular-expressions.info/posixbrackets.html).  
-*Usefull for series or audio files. The (**1** entry) will be internally transformed into ([[:upper:]][[:upper:]][[:upper:]][[:upper:]][[:space:]][[:digit:]][[:digit:]]) full (**2** character classe compliant), using (**3** strinct mode)*  
+*Usefull for series or audio files. The (**1** entry) will be internally transformed into ([[:upper:]][[:upper:]][[:upper:]][[:upper:]][[:space:]][[:digit:]][[:digit:]]) full (**2** character classe compliant), using (**3** strict mode)*  
 ![Substract pattern](readME-Pic/substract-1.jpg  "Substract pattern")  
 
  **Adding Titles to filenames.**  
