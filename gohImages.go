@@ -1,6 +1,6 @@
 // gohImages.go
 
-// Source file auto-generated on Thu, 25 Jul 2019 18:41:58 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
+// Source file auto-generated on Sun, 28 Jul 2019 07:02:22 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
 
 /*
 	This program comes with absolutely no warranty. See the The MIT License (MIT) for details:
@@ -27,7 +27,6 @@ func assignImages() {
 	setWinIcon(mainObjects.OverWindow, renameMultiDocuments48x48)
 	setButtonImage(mainObjects.RenApplyButton, toggleOn18x18)
 	setButtonImage(mainObjects.RenKeepBtwButton, keepBetween18)
-	setButtonImage(mainObjects.RenOrgSelButton, reset18x18)
 	setButtonImage(mainObjects.RenRegexButton, regex18x18)
 	setButtonImage(mainObjects.RenSubButton, substract18)
 	setButtonImage(mainObjects.SingleCancelButton, cancel18x18)
@@ -36,9 +35,7 @@ func assignImages() {
 	setButtonImage(mainObjects.SingleResetButton, reset18x18)
 	setButtonImage(mainObjects.SingleSwMultiButton, renameMultiDocuments18x18)
 	setWinIcon(mainObjects.SingleWindow, renameMultiDocuments48x48)
-	setButtonImage(mainObjects.TitlCopyListButton, archiveFolder18x18)
 	setButtonImage(mainObjects.TitleApplyButton, toggleOn18x18)
-	setButtonImage(mainObjects.TitlOrgSelButton, reset18x18)
 	setImage(mainObjects.TopImage, renameMachine700x48)
 }
 

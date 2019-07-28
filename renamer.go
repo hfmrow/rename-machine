@@ -16,7 +16,6 @@ import (
 	"strconv"
 	"strings"
 
-	g "github.com/hfmrow/renMachine/genLib"
 	gi "github.com/hfmrow/renMachine/gtk3Import"
 )
 
@@ -59,44 +58,44 @@ func getEntryDatas() {
 	// Remove
 	modifName.remove = modifName.remove[:0]
 	entry, err = mainObjects.RenRemEntry.GetText()
-	g.Check(err)
-	entry, _ = g.TrimSpace(entry, "-w")
+	Check(err)
+	entry, _ = TrimSpace(entry, "-w")
 	modifName.remove = append(modifName.remove, entry)
 	entry, err = mainObjects.RenRemEntry1.GetText()
-	g.Check(err)
-	entry, _ = g.TrimSpace(entry, "-w")
+	Check(err)
+	entry, _ = TrimSpace(entry, "-w")
 	modifName.remove = append(modifName.remove, entry)
 	entry, err = mainObjects.RenRemEntry2.GetText()
-	g.Check(err)
-	entry, _ = g.TrimSpace(entry, "-w")
+	Check(err)
+	entry, _ = TrimSpace(entry, "-w")
 	modifName.remove = append(modifName.remove, entry)
 	// Replace
 	modifName.replace = modifName.replace[:0]
 	entry, err = mainObjects.RenReplEntry.GetText()
-	g.Check(err)
-	entry, _ = g.TrimSpace(entry, "-w")
+	Check(err)
+	entry, _ = TrimSpace(entry, "-w")
 	modifName.replace = append(modifName.replace, entry)
 	entry, err = mainObjects.RenReplEntry1.GetText()
-	g.Check(err)
-	entry, _ = g.TrimSpace(entry, "-w")
+	Check(err)
+	entry, _ = TrimSpace(entry, "-w")
 	modifName.replace = append(modifName.replace, entry)
 	entry, err = mainObjects.RenReplEntry2.GetText()
-	g.Check(err)
-	entry, _ = g.TrimSpace(entry, "-w")
+	Check(err)
+	entry, _ = TrimSpace(entry, "-w")
 	modifName.replace = append(modifName.replace, entry)
 	// With
 	modifName.with = modifName.with[:0]
 	entry, err = mainObjects.RenWthEntry.GetText()
-	g.Check(err)
-	entry, _ = g.TrimSpace(entry, "-w")
+	Check(err)
+	entry, _ = TrimSpace(entry, "-w")
 	modifName.with = append(modifName.with, entry)
 	entry, err = mainObjects.RenWthEntry1.GetText()
-	g.Check(err)
-	entry, _ = g.TrimSpace(entry, "-w")
+	Check(err)
+	entry, _ = TrimSpace(entry, "-w")
 	modifName.with = append(modifName.with, entry)
 	entry, err = mainObjects.RenWthEntry2.GetText()
-	g.Check(err)
-	entry, _ = g.TrimSpace(entry, "-w")
+	Check(err)
+	entry, _ = TrimSpace(entry, "-w")
 	modifName.with = append(modifName.with, entry)
 }
 
@@ -133,9 +132,9 @@ func substractIt(inStr, toSub string, caseSensitive, posixCC, posixCCStrictMode 
 			toSubReg, err = regexp.Compile(toSub)
 		}
 	} else {
-		toSubReg, err = regexp.Compile(g.StringToCharacterClasses(toSub, caseSensitive, posixCCStrictMode))
+		toSubReg, err = regexp.Compile(StringToCharacterClasses(toSub, caseSensitive, posixCCStrictMode))
 	}
-	g.Check(err)
+	Check(err)
 	// Do the substract operation
 	tmpOutStr := toSubReg.FindStringSubmatch(inStr)
 	if len(tmpOutStr) != 0 {
@@ -177,11 +176,11 @@ func keepBetweenIt(inStr string, toRemove []string, caseSensitive, posixCC, posi
 			toKeepBtwReg, err = regexp.Compile(after + "(.*?)" + before)
 		}
 	} else {
-		toKeepBtwReg, err = regexp.Compile(g.StringToCharacterClasses(after,
-			caseSensitive, posixCCStrictMode) + "(.*?)" + g.StringToCharacterClasses(before,
+		toKeepBtwReg, err = regexp.Compile(StringToCharacterClasses(after,
+			caseSensitive, posixCCStrictMode) + "(.*?)" + StringToCharacterClasses(before,
 			caseSensitive, posixCCStrictMode))
 	}
-	g.Check(err)
+	Check(err)
 	// Do the Keep between operation
 	tmpOutStr := toKeepBtwReg.FindStringSubmatch(inStr)
 
@@ -201,7 +200,7 @@ func renameMe(from, to [][]string, fromTitle ...bool) (errList []string, err err
 	}
 
 	if title {
-		lengthTo = len(g.CmpRemSl2d(from, to))
+		lengthTo = len(CmpRemSl2d(from, to))
 	} else {
 		lengthTo = len(from)
 	}
@@ -236,8 +235,23 @@ func renameMe(from, to [][]string, fromTitle ...bool) (errList []string, err err
 
 // Combined rename function
 func renameAndRefresh(from, to [][]string) {
+	var outString string
+	var tmpSliceDup, tmpSliceExist []string
+	var tmp2dSl [][]string
 	if len(from) != 0 && len(to) != 0 {
-		if !g.CheckForDupSl2d(to) {
+		// Check for iplucate or existing files.
+		tmpSliceDup = CheckForDupSl2d(to)
+		FindDir(to[0][0], []string{"*"}, &tmpSliceExist, false, false, false)
+		tmp2dSl = decomposeFileList(tmpSliceExist)
+		tmpSliceExist = CmpSl2d(tmp2dSl, to)
+		if len(tmpSliceExist) != 0 {
+			outString = "\n" + sts["alreadyExist"] + "\n" + strings.Join(tmpSliceExist, "\n")
+		}
+		if len(tmpSliceDup) != 0 {
+			outString += sts["dupFile"] + "\n" + strings.Join(tmpSliceDup, "\n")
+		}
+
+		if len(outString) == 0 {
 			errList, err := renameMe(from, to)
 			if err != nil {
 				if err.Error() == errCancel {
@@ -262,8 +276,9 @@ func renameAndRefresh(from, to [][]string) {
 					gi.DlgMessage(mainObjects.MainWindow, "alert", sts["mstk"], sts["errFiles"], "", sts["ok"])
 				}
 			}
-		} else {
-			gi.DlgMessage(mainObjects.MainWindow, "alert", sts["mstk"], sts["couldnotproceed"], "", sts["ok"])
 		}
+	}
+	if len(outString) > 0 {
+		gi.DlgMessage(mainObjects.MainWindow, "alert", sts["mstk"], outString, "", sts["ok"])
 	}
 }

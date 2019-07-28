@@ -1,12 +1,12 @@
 // translate.go
 
-// File generated on Thu, 25 Jul 2019 04:35:07 using Gotk3ObjectsTranslate v1.3 2019 H.F.M
+// File generated on Sun, 28 Jul 2019 07:02:49 using Gotk3ObjectsTranslate v1.3 2019 H.F.M
 
 /*
 * 	This program comes with absolutely no warranty.
 *	See the The MIT License (MIT) for details:
 *	https://opensource.org/licenses/mit-license.php
-*/
+ */
 
 package main
 
@@ -27,6 +27,7 @@ import (
 func (trans *MainTranslate) initGtkObjectsText() {
 	trans.setTextToGtkObjects(&mainObjects.FileListTreeview.Widget, "FileListTreeview")
 	trans.setTextToGtkObjects(&mainObjects.MoveApplyButton.Widget, "MoveApplyButton")
+	trans.setTextToGtkObjects(&mainObjects.MoveCumulativeDndChk.Widget, "MoveCumulativeDndChk")
 	trans.setTextToGtkObjects(&mainObjects.MoveEntryExtMask.Widget, "MoveEntryExtMask")
 	trans.setTextToGtkObjects(&mainObjects.MoveFilechooserButton.Widget, "MoveFilechooserButton")
 	trans.setTextToGtkObjects(&mainObjects.MoveLabelExtMask.Widget, "MoveLabelExtMask")
@@ -43,6 +44,7 @@ func (trans *MainTranslate) initGtkObjectsText() {
 	trans.setTextToGtkObjects(&mainObjects.OverResetButton.Widget, "OverResetButton")
 	trans.setTextToGtkObjects(&mainObjects.RenApplyButton.Widget, "RenApplyButton")
 	trans.setTextToGtkObjects(&mainObjects.RenCaseSensChk.Widget, "RenCaseSensChk")
+	trans.setTextToGtkObjects(&mainObjects.RenCumulativeDndChk.Widget, "RenCumulativeDndChk")
 	trans.setTextToGtkObjects(&mainObjects.RenEntryExtMask.Widget, "RenEntryExtMask")
 	trans.setTextToGtkObjects(&mainObjects.RenIncrementChk.Widget, "RenIncrementChk")
 	trans.setTextToGtkObjects(&mainObjects.RenIncrementRightChk.Widget, "RenIncrementRightChk")
@@ -50,7 +52,6 @@ func (trans *MainTranslate) initGtkObjectsText() {
 	trans.setTextToGtkObjects(&mainObjects.RenIncSpinbutton.Widget, "RenIncSpinbutton")
 	trans.setTextToGtkObjects(&mainObjects.RenKeepBtwButton.Widget, "RenKeepBtwButton")
 	trans.setTextToGtkObjects(&mainObjects.RenLabelExtMask.Widget, "RenLabelExtMask")
-	trans.setTextToGtkObjects(&mainObjects.RenOrgSelButton.Widget, "RenOrgSelButton")
 	trans.setTextToGtkObjects(&mainObjects.RenPresExtChk.Widget, "RenPresExtChk")
 	trans.setTextToGtkObjects(&mainObjects.RenPrevTreeview.Widget, "RenPrevTreeview")
 	trans.setTextToGtkObjects(&mainObjects.RenRegexButton.Widget, "RenRegexButton")
@@ -73,19 +74,19 @@ func (trans *MainTranslate) initGtkObjectsText() {
 	trans.setTextToGtkObjects(&mainObjects.SinglePresExtChk.Widget, "SinglePresExtChk")
 	trans.setTextToGtkObjects(&mainObjects.SingleResetButton.Widget, "SingleResetButton")
 	trans.setTextToGtkObjects(&mainObjects.SingleSwMultiButton.Widget, "SingleSwMultiButton")
-	trans.setTextToGtkObjects(&mainObjects.TitlCopyListButton.Widget, "TitlCopyListButton")
 	trans.setTextToGtkObjects(&mainObjects.TitleAddAEntry.Widget, "TitleAddAEntry")
 	trans.setTextToGtkObjects(&mainObjects.TitleAddBEntry.Widget, "TitleAddBEntry")
 	trans.setTextToGtkObjects(&mainObjects.TitleAddBFileEntry.Widget, "TitleAddBFileEntry")
 	trans.setTextToGtkObjects(&mainObjects.TitleApplyButton.Widget, "TitleApplyButton")
+	trans.setTextToGtkObjects(&mainObjects.TitleCumulativeDndChk.Widget, "TitleCumulativeDndChk")
 	trans.setTextToGtkObjects(&mainObjects.TitlePrevTreeview.Widget, "TitlePrevTreeview")
 	trans.setTextToGtkObjects(&mainObjects.TitleScanSubDirChk.Widget, "TitleScanSubDirChk")
 	trans.setTextToGtkObjects(&mainObjects.TitleSepEntry.Widget, "TitleSepEntry")
 	trans.setTextToGtkObjects(&mainObjects.TitleSpinbutton.Widget, "TitleSpinbutton")
 	trans.setTextToGtkObjects(&mainObjects.TitleTextview.Widget, "TitleTextview")
-	trans.setTextToGtkObjects(&mainObjects.TitlOrgSelButton.Widget, "TitlOrgSelButton")
 	trans.setTextToGtkObjects(&mainObjects.TopImage.Widget, "TopImage")
 }
+
 // Translations structure declaration. To be used in main application.
 var translate = new(MainTranslate)
 
@@ -94,30 +95,31 @@ var translate = new(MainTranslate)
 // They'll be added to language file each time application started
 // when "devMode" is set at true.
 var sts = map[string]string{
-	`no`: `No`,
-	`openf`: `Open file`,
-	`all`: `All`,
-	`allow`: `Allow`,
-	`cancel`: `Cancel`,
-	`deny`: `Deny`,
-	`confirm`: `Comfirmation !`,
-	`renErr`: `Renaming error: `,
-	`savef`: `Save file`,
-	`yes`: `Yes`,
-	`errDir`: `Error reading directory content.`,
-	`fileExist`: `: file exists`,
-	`ok`: `Ok`,
-	`none`: `None`,
-	`proceed`: `Proceed with : `,
-	`retry`: `Retry`,
-	`coulnotproceed`: `
-Could not proceed: 
-Some filenames are duplicates.`,
+	`no`:        `No`,
+	`ok`:        `Ok`,
 	`emptyname`: `Empty filename`,
-	`file`: ` file ? `,
-	`mstk`: `A mistake ...`,
+	`file`:      ` file ? `,
+	`confirm`:   `Comfirmation !`,
+	`savef`:     `Save file`,
+	`cancel`:    `Cancel`,
+	`deny`:      `Deny`,
+	`allow`:     `Allow`,
+	`openf`:     `Open file`,
+	`errDir`:    `Error reading directory content.`,
+	`proceed`:   `Proceed with : `,
+	`renErr`:    `Renaming error: `,
+	`yes`:       `Yes`,
+	`retry`:     `Retry`,
+	`mstk`:      `A mistake ...`,
+	`filenameErr`: `You got an issue with:
+`,
+	`none`:         `None`,
+	`all`:          `All`,
+	`fileExist`:    `: file exists`,
+	`alreadyExist`: `Filename(s) already exists:`,
+	`dupFile`: `
+Duplicate filename(s):`,
 }
-
 
 // Translations structure with methods
 type MainTranslate struct {

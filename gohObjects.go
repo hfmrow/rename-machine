@@ -1,6 +1,6 @@
 // gohObjects.go
 
-// Source file auto-generated on Thu, 25 Jul 2019 18:41:58 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
+// Source file auto-generated on Sun, 28 Jul 2019 07:02:22 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
 
 /*
 	This program comes with absolutely no warranty. See the The MIT License (MIT) for details:
@@ -10,8 +10,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -27,6 +25,7 @@ type MainControlsObj struct {
 	mainUiBuilder              *gtk.Builder
 	MainWindow                 *gtk.Window
 	MoveApplyButton            *gtk.Button
+	MoveCumulativeDndChk       *gtk.CheckButton
 	MoveEntryExtMask           *gtk.Entry
 	MoveFilechooserButton      *gtk.FileChooserButton
 	MoveLabelExtMask           *gtk.Label
@@ -49,6 +48,7 @@ type MainControlsObj struct {
 	OverWindow                 *gtk.Window
 	RenApplyButton             *gtk.Button
 	RenCaseSensChk             *gtk.CheckButton
+	RenCumulativeDndChk        *gtk.CheckButton
 	RenEntryExtMask            *gtk.Entry
 	RenIncrementChk            *gtk.CheckButton
 	RenIncrementRightChk       *gtk.CheckButton
@@ -57,7 +57,6 @@ type MainControlsObj struct {
 	RenKeepBtwButton           *gtk.Button
 	RenLabelExtMask            *gtk.Label
 	renListstore               *gtk.ListStore /*MANUAL*/
-	RenOrgSelButton            *gtk.Button
 	RenPresExtChk              *gtk.CheckButton
 	RenPrevTreeview            *gtk.TreeView
 	RenRegexButton             *gtk.Button
@@ -82,18 +81,17 @@ type MainControlsObj struct {
 	SingleSwMultiButton        *gtk.Button
 	SingleWindow               *gtk.Window
 	Statusbar                  *gtk.Statusbar
-	TitlCopyListButton         *gtk.Button
 	TitleAddAEntry             *gtk.Entry
 	TitleAddBEntry             *gtk.Entry
 	TitleAddBFileEntry         *gtk.Entry
 	TitleApplyButton           *gtk.Button
+	TitleCumulativeDndChk      *gtk.CheckButton
 	titleListstore             *gtk.ListStore /*MANUAL*/
 	TitlePrevTreeview          *gtk.TreeView
 	TitleScanSubDirChk         *gtk.CheckButton
 	TitleSepEntry              *gtk.Entry
 	TitleSpinbutton            *gtk.SpinButton
 	TitleTextview              *gtk.TextView
-	TitlOrgSelButton           *gtk.Button
 	TopImage                   *gtk.Image
 	TopImageEventbox           *gtk.EventBox
 }
@@ -106,6 +104,7 @@ func gladeObjParser() {
 	mainObjects.FileListTreeview = loadObject("FileListTreeview").(*gtk.TreeView)
 	mainObjects.MainWindow = loadObject("MainWindow").(*gtk.Window)
 	mainObjects.MoveApplyButton = loadObject("MoveApplyButton").(*gtk.Button)
+	mainObjects.MoveCumulativeDndChk = loadObject("MoveCumulativeDndChk").(*gtk.CheckButton)
 	mainObjects.MoveEntryExtMask = loadObject("MoveEntryExtMask").(*gtk.Entry)
 	mainObjects.MoveFilechooserButton = loadObject("MoveFilechooserButton").(*gtk.FileChooserButton)
 	mainObjects.MoveLabelExtMask = loadObject("MoveLabelExtMask").(*gtk.Label)
@@ -127,19 +126,14 @@ func gladeObjParser() {
 	mainObjects.OverWindow = loadObject("OverWindow").(*gtk.Window)
 	mainObjects.RenApplyButton = loadObject("RenApplyButton").(*gtk.Button)
 	mainObjects.RenCaseSensChk = loadObject("RenCaseSensChk").(*gtk.CheckButton)
+	mainObjects.RenCumulativeDndChk = loadObject("RenCumulativeDndChk").(*gtk.CheckButton)
 	mainObjects.RenEntryExtMask = loadObject("RenEntryExtMask").(*gtk.Entry)
 	mainObjects.RenIncrementChk = loadObject("RenIncrementChk").(*gtk.CheckButton)
 	mainObjects.RenIncrementRightChk = loadObject("RenIncrementRightChk").(*gtk.CheckButton)
 	mainObjects.RenIncSepEntry = loadObject("RenIncSepEntry").(*gtk.Entry)
 	mainObjects.RenIncSpinbutton = loadObject("RenIncSpinbutton").(*gtk.SpinButton)
-	if ad, err := gtk.AdjustmentNew(0, 0, 65534, 1, 0, 0); err == nil { /*MANUAL*/
-		mainObjects.RenIncSpinbutton.Configure(ad, 1, 0) /*MANUAL*/
-	} else { /*MANUAL*/
-		fmt.Println("Error on:", "RenIncSpinbutton", "Initialisation") /*MANUAL*/
-	} /*MANUAL*/
 	mainObjects.RenKeepBtwButton = loadObject("RenKeepBtwButton").(*gtk.Button)
 	mainObjects.RenLabelExtMask = loadObject("RenLabelExtMask").(*gtk.Label)
-	mainObjects.RenOrgSelButton = loadObject("RenOrgSelButton").(*gtk.Button)
 	mainObjects.RenPresExtChk = loadObject("RenPresExtChk").(*gtk.CheckButton)
 	mainObjects.RenPrevTreeview = loadObject("RenPrevTreeview").(*gtk.TreeView)
 	mainObjects.RenRegexButton = loadObject("RenRegexButton").(*gtk.Button)
@@ -164,22 +158,16 @@ func gladeObjParser() {
 	mainObjects.SingleSwMultiButton = loadObject("SingleSwMultiButton").(*gtk.Button)
 	mainObjects.SingleWindow = loadObject("SingleWindow").(*gtk.Window)
 	mainObjects.Statusbar = loadObject("Statusbar").(*gtk.Statusbar)
-	mainObjects.TitlCopyListButton = loadObject("TitlCopyListButton").(*gtk.Button)
 	mainObjects.TitleAddAEntry = loadObject("TitleAddAEntry").(*gtk.Entry)
 	mainObjects.TitleAddBEntry = loadObject("TitleAddBEntry").(*gtk.Entry)
 	mainObjects.TitleAddBFileEntry = loadObject("TitleAddBFileEntry").(*gtk.Entry)
 	mainObjects.TitleApplyButton = loadObject("TitleApplyButton").(*gtk.Button)
+	mainObjects.TitleCumulativeDndChk = loadObject("TitleCumulativeDndChk").(*gtk.CheckButton)
 	mainObjects.TitlePrevTreeview = loadObject("TitlePrevTreeview").(*gtk.TreeView)
 	mainObjects.TitleScanSubDirChk = loadObject("TitleScanSubDirChk").(*gtk.CheckButton)
 	mainObjects.TitleSepEntry = loadObject("TitleSepEntry").(*gtk.Entry)
 	mainObjects.TitleSpinbutton = loadObject("TitleSpinbutton").(*gtk.SpinButton)
-	if ad, err := gtk.AdjustmentNew(0, 0, 30, 1, 0, 0); err == nil { /*MANUAL*/
-		mainObjects.TitleSpinbutton.Configure(ad, 1, 0) /*MANUAL*/
-	} else { /*MANUAL*/
-		fmt.Println("Error on:", "TitleSpinbutton", "Initialisation") /*MANUAL*/
-	} /*MANUAL*/
 	mainObjects.TitleTextview = loadObject("TitleTextview").(*gtk.TextView)
-	mainObjects.TitlOrgSelButton = loadObject("TitlOrgSelButton").(*gtk.Button)
 	mainObjects.TopImage = loadObject("TopImage").(*gtk.Image)
 	mainObjects.TopImageEventbox = loadObject("TopImageEventbox").(*gtk.EventBox)
 }

@@ -1,6 +1,6 @@
 // gohSignals.go
 
-// Source file auto-generated on Thu, 25 Jul 2019 18:41:58 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
+// Source file auto-generated on Sun, 28 Jul 2019 07:02:22 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
 
 /*
 	This program comes with absolutely no warranty. See the The MIT License (MIT) for details:
@@ -15,6 +15,7 @@ package main
 /***************************/
 func signalsPropHandler() {
 	mainObjects.MoveApplyButton.Connect("clicked", MoveApplyButtonClicked)
+	mainObjects.MoveCumulativeDndChk.Connect("clicked", CumulativeDndChkClicked)
 	mainObjects.MoveEntryExtMask.Connect("activate", MoveEntryExtMaskEnterKeyPressed)
 	mainObjects.MoveEntryExtMask.Connect("focus-out-event", MoveEntryExtMaskEnterKeyPressed)
 	mainObjects.MoveFilechooserButton.Connect("selection-changed", MoveFilechooserButtonClicked)
@@ -25,6 +26,7 @@ func signalsPropHandler() {
 	mainObjects.OverCharClassStrictModeChk.Connect("clicked", OverCharClassStrictModeChkChanged)
 	mainObjects.RenApplyButton.Connect("clicked", RenApplyButtonClicked)
 	mainObjects.RenCaseSensChk.Connect("clicked", RenCaseSensChkChanged)
+	mainObjects.RenCumulativeDndChk.Connect("clicked", CumulativeDndChkClicked)
 	mainObjects.RenEntryExtMask.Connect("activate", RenEntryExtMaskEnterKeyPressed)
 	mainObjects.RenEntryExtMask.Connect("focus-out-event", RenEntryExtMaskEnterKeyPressed)
 	mainObjects.RenIncrementChk.Connect("clicked", RenIncrementChkClicked)
@@ -33,7 +35,6 @@ func signalsPropHandler() {
 	mainObjects.RenIncSpinbutton.Connect("value-changed", RenRemEntryFocusOut)
 	mainObjects.RenKeepBtwButton.Connect("clicked", RenKeepBtwButtonClicked)
 	mainObjects.RenLabelExtMask.Connect("notify", blankNotify)
-	mainObjects.RenOrgSelButton.Connect("clicked", OrgSelButtonClicked)
 	mainObjects.RenPresExtChk.Connect("clicked", RenPresExtChkChanged)
 	mainObjects.RenRegexButton.Connect("clicked", RenRegexButtonClicked)
 	mainObjects.RenRemEntry.Connect("changed", RenRemEntryFocusOut)
@@ -55,16 +56,15 @@ func signalsPropHandler() {
 	mainObjects.SinglePresExtChk.Connect("clicked", SinglePresExtChkClicked)
 	mainObjects.SingleResetButton.Connect("clicked", SingleResetButtonClicked)
 	mainObjects.SingleSwMultiButton.Connect("clicked", SingleSwMultiButtonClicked)
-	mainObjects.TitlCopyListButton.Connect("clicked", TitlCopyListButtonClicked)
 	mainObjects.TitleAddAEntry.Connect("changed", TitleEntryFocusOut)
 	mainObjects.TitleAddBEntry.Connect("changed", TitleEntryFocusOut)
 	// mainObjects.TitleAddBFileEntry.Connect("focus-out-event", TitleAddToFileEntryEvent)
 	mainObjects.TitleAddBFileEntry.Connect("changed", TitleAddToFileEntryEvent)
 	mainObjects.TitleApplyButton.Connect("clicked", TitleApplyButtonClicked)
+	mainObjects.TitleCumulativeDndChk.Connect("clicked", CumulativeDndChkClicked)
 	mainObjects.TitleScanSubDirChk.Connect("clicked", ScanSubDirChkChanged)
 	mainObjects.TitleSepEntry.Connect("changed", TitleEntryFocusOut)
 	mainObjects.TitleSpinbutton.Connect("value-changed", TitleEntryFocusOut)
 	mainObjects.TitleTextview.Connect("event", TitleEntryFocusOut)
-	mainObjects.TitlOrgSelButton.Connect("clicked", OrgSelButtonClicked)
 	mainObjects.TopImageEventbox.Connect("button-release-event", imgTopReleaseEvent)
 }

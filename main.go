@@ -1,9 +1,9 @@
 // main.go
 
-// Source file auto-generated on Thu, 25 Jul 2019 18:41:58 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
+// Source file auto-generated on Sun, 28 Jul 2019 07:02:22 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
 
 /*
-	RenameMachine v1.4.5 ©2018-19 H.F.M
+	RenameMachine v1.5 ©2018-19 H.F.M
 
 	This program comes with absolutely no warranty. See the The MIT License (MIT) for details:
 
@@ -28,9 +28,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/gotk3/gotk3/gtk"
-	g "github.com/hfmrow/renMachine/genLib"
 	gi "github.com/hfmrow/renMachine/gtk3Import"
 )
 
@@ -67,7 +67,7 @@ func main() {
 		renameMachine400x27,
 		checked18x18)
 
-	if len(os.Args) > 2 {
+	if len(os.Args) != 2 {
 		multi = true
 	}
 
@@ -83,43 +83,18 @@ func main() {
 }
 
 func mainApplication() {
-
 	/* Translate init. */
 	translate = MainTranslateNew(absoluteRealPath+mainOptions.LanguageFilename, devMode)
 
-	// Init files list
-	for idx := 1; idx < len(os.Args); idx++ {
-		mainOptions.primeFilesList = append(mainOptions.primeFilesList, os.Args[idx])
-		if len(mainOptions.baseDirectory) == 0 {
-			name := mainOptions.primeFilesList[0]
-			fileInfos := g.SplitFilepath(name)
-			if fileInfos.IsDir {
-				if fileInfos.SymLink {
-					mainOptions.baseDirectory = fileInfos.SymLinkTo
-				} else {
-					mainOptions.baseDirectory = name
-				}
-			} else {
-				mainOptions.baseDirectory = fileInfos.Path
-			}
-		}
-	}
-	dnd = true
-	switch len(os.Args) {
-	case 1:
-		gi.DlgMessage(mainObjects.MainWindow, "alert", "Files selection", "\nPlease select some files to proceed ... ", "", "ok")
-		fmt.Println("\nNo file to proceed !")
-		os.Exit(0)
-	case 2:
-		dnd = false
-		splited := g.SplitFilepath(mainOptions.primeFilesList[0])
-		singleEntry = []string{splited.Path, splited.BaseNoExt, splited.Ext}
-		if splited.IsDir {
-			// backup previous state of preserve extension in case of modification of folder name
+	if len(os.Args) == 2 {
+		singleEntry = []string{filepath.Dir(os.Args[1]), BaseNoExt(filepath.Base(os.Args[1])), filepath.Ext(os.Args[1])}
+		if fileInfo, _ := os.Stat(os.Args[1]); fileInfo.IsDir() {
+			// backup previous state of preserve extension in case of folder name modification
 			bakPresExt = mainOptions.PreserveExtSingle
 			mainOptions.PreserveExtSingle = false
 			mainObjects.SinglePresExtChk.SetVisible(false)
 			mainObjects.SingleEntry.SetText(singleEntry[1] + singleEntry[2])
+			mainOptions.baseDirectory = os.Args[1]
 		} else {
 			mainObjects.SinglePresExtChk.SetActive(mainOptions.PreserveExtSingle)
 			if mainOptions.PreserveExtSingle {
@@ -128,14 +103,17 @@ func mainApplication() {
 				mainObjects.SingleEntry.SetText(singleEntry[1] + singleEntry[2])
 			}
 		}
-		// Select whole entry content
+		// Select whole entry content (filename)
 		mainObjects.SingleEntry.SelectRegion(0, int(mainObjects.SingleEntry.GetTextLength()))
 		mainObjects.SingleEntry.GrabFocus()
+	} else {
+		// Build files list
+		for idx := 1; idx < len(os.Args); idx++ {
+			mainOptions.primeFilesList = append(mainOptions.primeFilesList, os.Args[idx])
+		}
 	}
 
 	restorePrimeFilesList()
-	mainOptions.ScanSubDir = false
-	mainOptions.ShowDirectory = false
 
 	initTreeview()
 
@@ -151,7 +129,7 @@ func mainApplication() {
 		fmt.Println("Error on:", "TitleSpinbutton", "Initialisation")
 	}
 
-	mainOptions.UpdateObjects()
+	mainOptions.UpdateObjects(true)
 }
 
 func initTreeview() {
