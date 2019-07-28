@@ -114,8 +114,8 @@ func mainApplication() {
 	}
 
 	restorePrimeFilesList()
-
 	initTreeview()
+	refreshLists()
 
 	/* Init Spinbutton */
 	if ad, err := gtk.AdjustmentNew(0, 0, 65534, 1, 0, 0); err == nil {
@@ -160,6 +160,4 @@ func initTreeview() {
 	mainObjects.moveListstore = gi.TreeViewListStoreSetup(mainObjects.MovePrevTreeview, false, oriFileListstoreCol, false)
 	column = mainObjects.MovePrevTreeview.GetColumn(0)
 	column.SetSortColumnID(-1)
-
-	refreshLists()
 }
