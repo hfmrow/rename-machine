@@ -503,8 +503,8 @@ func SingleSwMultiButtonClicked() {
 		}
 	} else {
 		mainOptions.primeFilesList = append(mainOptions.primeFilesList, filename)
-		restorePrimeFilesList()
 	}
+	restorePrimeFilesList()
 	resetFilenamesStorage()
 	refreshLists()
 
