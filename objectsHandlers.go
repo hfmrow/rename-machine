@@ -11,58 +11,55 @@ import (
 	"strings"
 
 	"github.com/gotk3/gotk3/gtk"
-	g "github.com/hfmrow/renMachine/genLib"
 	gi "github.com/hfmrow/renMachine/gtk3Import"
 )
 
 // Notebook page changed
 func NotebookPageChanged(nb *gtk.Notebook, page *gtk.Widget, pageNum uint) {
 	mainOptions.currentTab = pageNum
-	mainOptions.UpdateOptions()
-	switch pageNum {
-	case 0: // RenamePage
-		// scanDirs()
-		resetFilenamesStorage()
+	// Restore options
+	mainOptions.ScanSubDir = tempScanSubDir
+	mainOptions.ShowDirectory = tempShowDirectory
+	mainOptions.PreserveExt = tempPreserveExt
+	mainOptions.UpdateObjects()
 
+	switch pageNum {
 	case 1: // TitlePage
 		mainOptions.PreserveExt = true
 		mainOptions.ShowDirectory = false
-		// scanDirs()
-		resetFilenamesStorage()
-
 	case 2: // MovePage
 		mainOptions.PreserveExt = false
 		mainOptions.ShowDirectory = false
 		mainOptions.ScanSubDir = true
-		scanDirs()
-		resetFilenamesStorage()
 	}
+
+	Check(scanDirs())
+	resetFilenamesStorage()
 	refreshLists()
 }
 
 // MoveEntryExtMaskEnterKeyPressed: Update data and disp on enter pressed
 func MoveEntryExtMaskEnterKeyPressed() bool {
 	mainOptions.ExtMask = BuildExtSlice(mainObjects.MoveEntryExtMask)
-	scanDirs()
+	Check(scanDirs())
 	resetFilenamesStorage()
 	refreshLists()
-	//	RenRemEntryFocusOut()
 	return false // GDK_EVENT_PROPAGATE signal
 }
 
 // RenEntryExtMaskEnterKeyPressed: Update data and disp on enter pressed
 func RenEntryExtMaskEnterKeyPressed() bool {
 	mainOptions.ExtMaskRen = BuildExtSlice(mainObjects.RenEntryExtMask)
-	scanDirs()
+	Check(scanDirs())
 	resetFilenamesStorage()
 	refreshLists()
-	//	RenRemEntryFocusOut()
 	return false // GDK_EVENT_PROPAGATE signal
 }
 
 // Chk handling for preserve ext
 func RenPresExtChkChanged() {
 	mainOptions.PreserveExt = mainObjects.RenPresExtChk.GetActive()
+	tempPreserveExt = mainOptions.PreserveExt
 	resetFilenamesStorage()
 	refreshLists()
 	RenRemEntryFocusOut()
@@ -72,7 +69,6 @@ func RenPresExtChkChanged() {
 func OverCaseSensChkChanged() {
 	mainOptions.OvercaseSensitive = mainObjects.OverCaseSensChk.GetActive()
 	if mainOptions.OvercaseSensitive {
-		// mainObjects.OverCharClassChk.SetSensitive(false)
 		mainObjects.OverCharClassChk.SetActive(false)
 	} else {
 		mainObjects.OverCharClassChk.SetSensitive(true)
@@ -123,7 +119,8 @@ func RenCaseSensChkChanged() {
 // Show dircetories toggled
 func RenShowDirChkChanged(chk *gtk.CheckButton) {
 	mainOptions.ShowDirectory = chk.GetActive()
-	scanDirs()
+	tempShowDirectory = mainOptions.ShowDirectory
+	Check(scanDirs())
 	resetFilenamesStorage()
 	refreshLists()
 	RenRemEntryFocusOut()
@@ -134,30 +131,23 @@ func ScanSubDirChkChanged(chk *gtk.CheckButton) {
 	mainOptions.ScanSubDir = chk.GetActive()
 	mainObjects.RenScanSubDirChk.SetActive(mainOptions.ScanSubDir)
 	mainObjects.TitleScanSubDirChk.SetActive(mainOptions.ScanSubDir)
-	scanDirs()
+	tempScanSubDir = mainOptions.ScanSubDir
+	Check(scanDirs())
 	resetFilenamesStorage()
 	refreshLists()
 	RenRemEntryFocusOut()
 }
 
-// Handling button for restoring original selection (1st one)
-func OrgSelButtonClicked() {
-	mainObjects.RenScanSubDirChk.SetActive(false)
-	mainObjects.TitleScanSubDirChk.SetActive(false)
-	restorePrimeFilesList()
-	resetEntriesAndReBuildTreeView()
-}
-
 // Handling button for choosing directory to move files to
 func MoveFilechooserButtonClicked() {
 	mainOptions.moveFilesList = mainOptions.moveFilesList[:0]
-	mainOptions.primeFilesList = mainOptions.primeFilesList[:0]
+	// mainOptions.primeFilesList = mainOptions.primeFilesList[:0]
 	for _, file := range mainOptions.orgFilenames {
 		mainOptions.moveFilesList = append(mainOptions.moveFilesList,
-			[]string{mainObjects.MoveFilechooserButton.GetFilename(), file[1], file[2]})
+			[]string{mainObjects.MoveFilechooserButton.GetFilename(), file[1], file[2], file[3]})
 
-		mainOptions.primeFilesList = append(mainOptions.primeFilesList,
-			filepath.Join(mainObjects.MoveFilechooserButton.GetFilename(), file[1]+file[2]))
+		/* = append(mainOptions.primeFilesList,
+		filepath.Join(mainObjects.MoveFilechooserButton.GetFilename(), file[1]+file[2], file[3]))*/
 	}
 	fillListstore(mainObjects.moveListstore, mainOptions.moveFilesList, true)
 }
@@ -165,6 +155,14 @@ func MoveFilechooserButtonClicked() {
 // Handling button for apply moving files
 func MoveApplyButtonClicked() {
 	renameAndRefresh(mainOptions.orgFilenames, mainOptions.moveFilesList)
+}
+
+// Clear Files list and all slices content
+func CumulativeDndChkClicked(chk *gtk.CheckButton) {
+	mainOptions.CumulativeDND = chk.GetActive()
+	mainObjects.RenCumulativeDndChk.SetActive(mainOptions.CumulativeDND)
+	mainObjects.MoveCumulativeDndChk.SetActive(mainOptions.CumulativeDND)
+	mainObjects.TitleCumulativeDndChk.SetActive(mainOptions.CumulativeDND)
 }
 
 // Handling title apply button
@@ -216,7 +214,7 @@ func TitleApplyButtonClicked() {
 			}
 			// Clean textview
 			txtBuff, err := mainObjects.TitleTextview.GetBuffer()
-			g.Check(err)
+			Check(err)
 			txtBuff.SetText("")
 
 			resetFilenamesStorage()
@@ -237,14 +235,14 @@ func TitleApplyButtonClicked() {
 func TitleTextviewFocusOut() {
 	var newList []string
 	txtBuff, err := mainObjects.TitleTextview.GetBuffer()
-	g.Check(err)
+	Check(err)
 	txt, err := txtBuff.GetText(txtBuff.GetStartIter(), txtBuff.GetEndIter(), false)
-	g.Check(err)
-	mainOptions.titlList = strings.Split(txt, g.GetTextEOL([]byte(txt)))
+	Check(err)
+	mainOptions.titlList = strings.Split(txt, GetTextEOL([]byte(txt)))
 
 	for _, line := range mainOptions.titlList {
-		tmpStr, err := g.TrimSpace(line, "-c")
-		g.Check(err)
+		tmpStr, err := TrimSpace(line, "-c")
+		Check(err)
 		if len(tmpStr) != 0 {
 			newList = append(newList, tmpStr)
 		}
@@ -255,9 +253,9 @@ func TitleTextviewFocusOut() {
 // Handling TitleAddToFileEntryEvent
 func TitleAddToFileEntryEvent() {
 	textB, err := mainObjects.TitleAddBFileEntry.GetText()
-	g.Check(err)
-	textB, err = g.TrimSpace(textB, "+w")
-	g.Check(err)
+	Check(err)
+	textB, err = TrimSpace(textB, "+w")
+	Check(err)
 	mainObjects.TitleAddBFileEntry.SetText(textB)
 
 	if len(textB) != 0 {
@@ -282,7 +280,7 @@ func TitlCopyListButtonClicked() {
 	if len(mainOptions.orgFilenames) != 0 {
 		var tmpText string
 		txtBuff, err := mainObjects.TitleTextview.GetBuffer()
-		g.Check(err)
+		Check(err)
 		txtBuff.SetText("")
 		for _, name := range mainOptions.orgFilenames {
 			tmpText += name[1] + "\n"
@@ -298,11 +296,11 @@ func TitleEntryFocusOut() {
 
 	var tmpFinalList []string
 	strSep, err := mainObjects.TitleSepEntry.GetText()
-	g.Check(err)
+	Check(err)
 	strAddA, err := mainObjects.TitleAddAEntry.GetText()
-	g.Check(err)
+	Check(err)
 	strAddB, err := mainObjects.TitleAddBEntry.GetText()
-	g.Check(err)
+	Check(err)
 	spinVal := mainObjects.TitleSpinbutton.GetValueAsInt()
 
 	if len(strSep) != 0 {
@@ -310,8 +308,8 @@ func TitleEntryFocusOut() {
 			tmpStrSl := strings.Split(line, strSep)
 			if spinVal < len(tmpStrSl) {
 				// Sanitize entries and remove useless spaces
-				tmpStr, err := g.TrimSpace(tmpStrSl[spinVal], "-c", "-w")
-				g.Check(err)
+				tmpStr, err := TrimSpace(tmpStrSl[spinVal], "-c", "-w")
+				Check(err)
 				tmpFinalList = append(tmpFinalList, strAddB+tmpStr+strAddA)
 			} else {
 				fmt.Println("field out of range")
@@ -319,8 +317,8 @@ func TitleEntryFocusOut() {
 		}
 	} else {
 		for _, line := range mainOptions.titlList {
-			tmpStr, err := g.TrimSpace(line, "-c", "-w")
-			g.Check(err)
+			tmpStr, err := TrimSpace(line, "-c", "-w")
+			Check(err)
 			tmpFinalList = append(tmpFinalList, strAddB+tmpStr+strAddA)
 		}
 	}
@@ -361,9 +359,9 @@ func RenKeepBtwButtonClicked() {
 
 	mainObjects.OverOkButton.Connect("clicked", func() {
 		txt, err := mainObjects.OverEntry.GetText()
-		g.Check(err)
+		Check(err)
 		txt1, err := mainObjects.OverEntry1.GetText()
-		g.Check(err)
+		Check(err)
 		if len(txt) != 0 && len(txt1) != 0 {
 			mainOptions.overText = mainOptions.overText[:0]
 			mainOptions.overText = append(mainOptions.overText, txt)
@@ -409,9 +407,9 @@ func RenRegexButtonClicked() {
 
 	mainObjects.OverOkButton.Connect("clicked", func() {
 		regexStr, err := mainObjects.OverEntry.GetText()
-		g.Check(err)
+		Check(err)
 		replaceWith, err := mainObjects.OverEntry1.GetText()
-		g.Check(err)
+		Check(err)
 		if len(regexStr) != 0 {
 			genericHideWindow(mainObjects.OverWindow)
 
@@ -449,7 +447,7 @@ func RenSubButtonClicked() {
 
 	mainObjects.OverOkButton.Connect("clicked", func() {
 		txt, err := mainObjects.OverEntry.GetText()
-		g.Check(err)
+		Check(err)
 		if len(txt) != 0 {
 
 			mainOptions.overText = mainOptions.overText[:0]
@@ -490,14 +488,25 @@ func SingleEntryEnterKeyPressed() {
 }
 
 func SingleSwMultiButtonClicked() {
-	if fi, _ := os.Stat(mainOptions.baseDirectory); fi.IsDir() {
-		if err = scanDirs(); err != nil {
+	filename := filepath.Join(singleEntry[0], singleEntry[1]) + singleEntry[2]
+	fi, err := os.Stat(filename)
+	if err != nil {
+		gi.DlgMessage(mainObjects.MainWindow, "error", sts["mstk"],
+			"\n"+sts["filenameErr"],
+			"", sts["ok"])
+		return
+	}
+	if fi.IsDir() {
+		if err = FindDir(filename, mainOptions.ExtMaskRen, &mainOptions.primeFilesList,
+			mainOptions.ScanSubDir, mainOptions.ShowDirectory, true); err != nil {
 			gi.DlgMessage(mainObjects.MainWindow, "error", sts["mstk"], sts["\nerrDir\n"]+err.Error(), "", sts["ok"])
 		}
-		scanDirs()
-		resetFilenamesStorage()
-		refreshLists()
+	} else {
+		mainOptions.primeFilesList = append(mainOptions.primeFilesList, filename)
+		restorePrimeFilesList()
 	}
+	resetFilenamesStorage()
+	refreshLists()
 
 	mainOptions.UpdateObjects()
 	mainObjects.SingleWindow.Hide()
@@ -517,7 +526,7 @@ func SingleOkButtonClicked() {
 	oldName = filepath.Join(singleEntry[0], singleEntry[1]+singleEntry[2])
 
 	if oldName != newName {
-		if g.FileExist(newName) {
+		if _, err := os.Stat(newName); !os.IsNotExist(err) {
 			err = errors.New(newName + ": file exists\n\n" + oldName + "\n")
 		} else {
 			err = os.Rename(oldName, newName)
@@ -544,13 +553,13 @@ func SinglePresExtChkClicked() {
 	if !mainObjects.SinglePresExtChk.GetActive() {
 		mainObjects.SingleEntry.SetText(text + singleEntry[2])
 	} else {
-		mainObjects.SingleEntry.SetText(g.SplitFilepath(text).BaseNoExt)
+		mainObjects.SingleEntry.SetText(BaseNoExt(filepath.Base(text)))
 	}
 }
 
 func SingleEntryChanged() {
 	text, _ := mainObjects.SingleEntry.GetText()
-	text, _ = g.TrimSpace(text, "+w")
+	text, _ = TrimSpace(text, "+w")
 	mainObjects.SingleEntry.SetText(text)
 }
 

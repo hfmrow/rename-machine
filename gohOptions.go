@@ -1,6 +1,6 @@
 // gohOptions.go
 
-// Source file auto-generated on Thu, 25 Jul 2019 18:41:58 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
+// Source file auto-generated on Sun, 28 Jul 2019 07:02:22 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
 
 /*
 	This program comes with absolutely no warranty. See the The MIT License (MIT) for details:
@@ -20,7 +20,7 @@ import (
 
 // App infos
 var Name = "RenameMachine"
-var Vers = "v1.4.5"
+var Vers = "v1.5"
 var Descr = "Rename and add titles to files"
 var Creat = "H.F.M"
 var YearCreat = "2018-19"
@@ -43,7 +43,11 @@ var errNbFileDoesNotMatch = "source and destination number files does not match 
 var errCancel = "cancelled"
 var modifName ModifName
 var bakPresExt bool
-var dnd bool
+
+var tempScanSubDir bool
+var tempShowDirectory bool
+var tempPreserveExt bool
+var tempDnd bool
 
 type ModifName struct {
 	remove  []string
@@ -70,6 +74,8 @@ type MainOpt struct {
 	OverPosixCharClass bool
 	OverPosixStrictMde bool
 	IncAtRight         bool
+
+	CumulativeDND bool
 
 	/* Private, will NOT be saved */
 	baseDirectory   string
@@ -99,13 +105,20 @@ func (opt *MainOpt) Init() {
 	opt.ExtMaskRen = []string{"*"}
 
 	opt.ExtSep = ";"
-
-	// opt.dndFilesList = new([]string)
 }
 
 // Variables -> Objects.
-func (opt *MainOpt) UpdateObjects() {
-	mainObjects.MainWindow.Resize(opt.MainWinWidth, opt.MainWinHeight)
+func (opt *MainOpt) UpdateObjects(sizeToo ...bool) {
+	var All bool
+	if len(sizeToo) > 0 {
+		All = sizeToo[0]
+	}
+	if All {
+		mainObjects.MainWindow.Resize(opt.MainWinWidth, opt.MainWinHeight)
+	}
+	mainObjects.RenCumulativeDndChk.SetActive(opt.CumulativeDND)
+	mainObjects.MoveCumulativeDndChk.SetActive(opt.CumulativeDND)
+	mainObjects.TitleCumulativeDndChk.SetActive(opt.CumulativeDND)
 
 	mainObjects.RenCaseSensChk.SetActive(opt.CaseSensitive)
 	mainObjects.RenPresExtChk.SetActive(opt.PreserveExt)
@@ -130,7 +143,10 @@ func (opt *MainOpt) UpdateObjects() {
 
 // Objects -> Variables.
 func (opt *MainOpt) UpdateOptions() {
+
 	opt.MainWinWidth, opt.MainWinHeight = mainObjects.MainWindow.GetSize()
+
+	opt.CumulativeDND = mainObjects.RenCumulativeDndChk.GetActive()
 
 	opt.CaseSensitive = mainObjects.RenCaseSensChk.GetActive()
 	opt.PreserveExt = mainObjects.RenPresExtChk.GetActive()
@@ -165,6 +181,9 @@ func (opt *MainOpt) Read() (err error) {
 	if textFileBytes, err = ioutil.ReadFile(optFilename); err == nil {
 		err = json.Unmarshal(textFileBytes, &opt)
 	}
+	tempScanSubDir = mainOptions.ScanSubDir
+	tempShowDirectory = mainOptions.ShowDirectory
+	tempPreserveExt = mainOptions.PreserveExt
 	return err
 }
 

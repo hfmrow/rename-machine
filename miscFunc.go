@@ -3,11 +3,14 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"runtime"
 	"runtime/debug"
@@ -16,23 +19,26 @@ import (
 	"strings"
 
 	"github.com/gotk3/gotk3/gtk"
-	g "github.com/hfmrow/renMachine/genLib"
 	gi "github.com/hfmrow/renMachine/gtk3Import"
 )
 
 // receiveDnd: Called on drag & drop
 func receiveDnd() {
-	dnd = true
-	mainOptions.primeFilesList = mainOptions.primeFilesList[:0]
-	resetFilenamesStorage()
+	if !mainOptions.CumulativeDND {
+		resetFilenamesStorage()
+		mainOptions.primeFilesList = mainOptions.primeFilesList[:0]
+	}
 	// Init files list
 	for _, value := range mainOptions.treeViewDropSet.FilesList {
-		mainOptions.primeFilesList = append(mainOptions.primeFilesList, value)
+		if !IsExistSl(mainOptions.primeFilesList, value) {
+			mainOptions.primeFilesList = append(mainOptions.primeFilesList, value)
+		}
 	}
 	restorePrimeFilesList()
 	mainOptions.ScanSubDir = false
 	mainOptions.ShowDirectory = false
-	mainOptions.UpdateObjects()
+	// mainOptions.UpdateObjects()
+	Check(scanDirs())
 	refreshLists()
 }
 
@@ -60,7 +66,7 @@ func Increment(inSL []string, separator string, startAt int, atLeft ...bool) (ou
 	return outSL
 }
 
-// BuildExtSlice
+// BuildExtSlice: Convert Entry mask to string slice
 func BuildExtSlice(entry *gtk.Entry) (ExtMask []string) {
 	tmpSliceStrings := strings.Split(getEntryText(entry), mainOptions.ExtSep)
 	if len(tmpSliceStrings[0]) == 0 {
@@ -83,16 +89,16 @@ func scanDirs() (err error) {
 	var ok bool
 
 	mainOptions.rawFilesList = mainOptions.rawFilesList[:0]
+	// According extension mask to tab position
 	switch mainOptions.currentTab {
 	case 0:
 		ext = mainOptions.ExtMaskRen
 	case 2:
 		ext = mainOptions.ExtMask
 	}
-
-	if dnd {
-		for _, file := range mainOptions.primeFilesList {
-			if fi, err = os.Stat(file); fi.IsDir() && err == nil {
+	for _, file := range mainOptions.primeFilesList {
+		if fi, err = os.Stat(file); err == nil {
+			if fi.IsDir() {
 				if mainOptions.ShowDirectory {
 					mainOptions.rawFilesList = append(mainOptions.rawFilesList, file)
 				}
@@ -100,28 +106,22 @@ func scanDirs() (err error) {
 					err = FindDir(file, ext, &mainOptions.rawFilesList,
 						mainOptions.ScanSubDir, mainOptions.ShowDirectory, true)
 				}
-			} else if err == nil {
+			} else {
 				for _, msk := range ext {
-					ok, err = filepath.Match(msk, filepath.Ext(file))
+					if ok, err = filepath.Match(msk, filepath.Ext(file)); ok {
+						mainOptions.rawFilesList = append(mainOptions.rawFilesList, file)
+						break
+					}
 					if err != nil {
 						return err
 					}
-					if ok {
-						break
-					}
-				}
-				if ok {
-					mainOptions.rawFilesList = append(mainOptions.rawFilesList, file)
 				}
 			}
-		}
-		return err
+		} /* else {
+			Check(err)
+		}*/
 	}
-
-	return FindDir(mainOptions.baseDirectory, ext,
-		&mainOptions.rawFilesList, mainOptions.ScanSubDir,
-		mainOptions.ShowDirectory, true)
-
+	return err
 }
 
 // FindDir retrieve file in a specific directory with more options.
@@ -205,15 +205,13 @@ func resetEntriesAndReBuildTreeView() (err error) {
 	mainObjects.RenWthEntry.SetText("")
 	mainObjects.RenWthEntry1.SetText("")
 	mainObjects.RenWthEntry2.SetText("")
-	mainObjects.TitleAddAEntry.SetText("")
-	mainObjects.TitleAddBEntry.SetText("")
-	mainObjects.TitleAddBFileEntry.SetText("")
-	mainObjects.TitleSepEntry.SetText("")
-	mainObjects.TitleSpinbutton.SetValue(0)
-	err = scanDirs()
-	resetFilenamesStorage()
-	refreshLists()
-	RenRemEntryFocusOut()
+	mainObjects.RenIncrementChk.SetActive(false)
+
+	if err = scanDirs(); err == nil {
+		resetFilenamesStorage()
+		refreshLists()
+		RenRemEntryFocusOut()
+	}
 	return err
 }
 
@@ -228,36 +226,33 @@ func resetFilenamesStorage() {
 
 // Convert classic filelist into decomposed version path, name, ext
 func decomposeFileList(inList []string) (outList [][]string) {
-	var splited g.Filepath
 	var outDir, outFiles [][]string
 	if len(inList) != 0 {
 		if mainOptions.PreserveExt {
 			for _, file := range inList {
-				splited = g.SplitFilepath(file)
-				if !splited.IsDir {
+				if fileInfo, _ := os.Stat(file); !fileInfo.IsDir() {
 					outFiles = append(outFiles,
-						[]string{splited.Path,
-							splited.BaseNoExt,
-							splited.Ext, "File"})
+						[]string{filepath.Dir(file),
+							BaseNoExt(filepath.Base(file)),
+							filepath.Ext(file), "File"})
 				} else if mainOptions.ShowDirectory {
 					outDir = append(outDir,
 						[]string{filepath.Dir(file),
-							splited.BaseNoExt,
-							splited.Ext, "Dir"})
+							BaseNoExt(filepath.Base(file)),
+							filepath.Ext(file), "Dir"})
 				}
 			}
 		} else {
 			for _, file := range inList {
-				splited = g.SplitFilepath(file)
-				if !splited.IsDir {
+				if fileInfo, _ := os.Stat(file); !fileInfo.IsDir() {
 					outFiles = append(outFiles,
-						[]string{splited.Path,
-							splited.Base,
+						[]string{filepath.Dir(file),
+							filepath.Base(file),
 							"", "File"})
 				} else if mainOptions.ShowDirectory {
 					outDir = append(outDir,
-						[]string{splited.Path,
-							splited.Base,
+						[]string{filepath.Dir(file),
+							filepath.Base(file),
 							"", "Dir"})
 				}
 			}
@@ -267,8 +262,6 @@ func decomposeFileList(inList []string) (outList [][]string) {
 		sort.SliceStable(outFiles, func(i, j int) bool { return strings.ToLower(outFiles[i][1]) < strings.ToLower(outFiles[j][1]) })
 		outList = append(outList, outFiles...)
 		outList = append(outList, outDir...)
-		// sort.SliceStable(outList, func(i, j int) bool { return strings.ToLower(outList[i][1]) > strings.ToLower(outList[j][1]) })
-		// sort.SliceStable(outList, func(i, j int) bool { return strings.ToLower(outList[i][3]) > strings.ToLower(outList[j][3]) })
 	}
 	return outList
 
@@ -292,9 +285,7 @@ func fillListstore(listStore *gtk.ListStore, inList [][]string, fullpath ...bool
 	var seeFullPath bool
 	var element []string
 	if len(fullpath) > 0 {
-		if fullpath[0] {
-			seeFullPath = true
-		}
+		seeFullPath = fullpath[0]
 	}
 	// Cleaning liststore
 	listStore.Clear()
@@ -358,8 +349,7 @@ func updateStatusBar() {
 	if filesCount > 2 {
 		wordFile = wordFile + "s"
 	}
-
-	displayStatusBar(fmt.Sprint(filesCount, wordFile), fmt.Sprint("Base directory: ", mainOptions.baseDirectory))
+	displayStatusBar(fmt.Sprint(filesCount, wordFile))
 }
 
 // StatusBar function ...
@@ -408,4 +398,173 @@ func Check(err error, message ...string) (state bool) {
 		}
 	}
 	return state
+}
+
+// BaseNoExt: get only the name without ext.
+func BaseNoExt(filename string) (outFilename string) {
+	outFilename = filepath.Base(filename)
+	ext := filepath.Ext(outFilename)
+	return outFilename[:len(outFilename)-len(ext)]
+}
+
+var platforms = [][]string{
+	{"darwin", "386", "\n"},
+	{"darwin", "amd64", "\n"},
+	{"dragonfly", "amd64", "\n"},
+	{"freebsd", "386", "\n"},
+	{"freebsd", "amd64", "\n"},
+	{"freebsd", "arm", "\n"},
+	{"linux", "386", "\n"},
+	{"linux", "amd64", "\n"},
+	{"linux", "arm", "\n"},
+	{"linux", "arm64", "\n"},
+	{"linux", "ppc64", "\n"},
+	{"linux", "ppc64le", "\n"},
+	{"linux", "mips", "\n"},
+	{"linux", "mipsle", "\n"},
+	{"linux", "mips64", "\n"},
+	{"linux", "mips64le", "\n"},
+	{"linux", "s390x", "\n"},
+	{"nacl", "386", "\n"},
+	{"nacl", "amd64p32", "\n"},
+	{"nacl", "arm", "\n"},
+	{"netbsd", "386", "\n"},
+	{"netbsd", "amd64", "\n"},
+	{"netbsd", "arm", "\n"},
+	{"openbsd", "386", "\n"},
+	{"openbsd", "amd64", "\n"},
+	{"openbsd", "arm", "\n"},
+	{"plan9", "386", "\n"},
+	{"plan9", "amd64", "\n"},
+	{"plan9", "arm", "\n"},
+	{"solaris", "amd64", "\n"},
+	{"windows", "386", "\r\n"},
+	{"windows", "amd64", "\r\n"}}
+
+// GetOsLineEnd: Get current OS line-feed
+func GetOsLineEnd() string {
+	for _, row := range platforms {
+		if row[0] == runtime.GOOS {
+			return row[2]
+		}
+	}
+	return "\n"
+}
+
+// GetTextEOL: Get EOL from text bytes (CR, LF, CRLF) > string or get OS line end.
+func GetTextEOL(inTextBytes []byte) (outString string) {
+	bCR := []byte{0x0D}
+	bLF := []byte{0x0A}
+	bCRLF := []byte{0x0D, 0x0A}
+	if bytes.Contains(inTextBytes, bCRLF) {
+		return string(bCRLF)
+	} else if bytes.Contains(inTextBytes, bCR) {
+		return string(bCR)
+	}
+	if bytes.Contains(inTextBytes, bLF) {
+		return string(bLF)
+	}
+	return GetOsLineEnd()
+}
+
+// TrimSpace: Some multiple way to trim strings. cmds is optionnal or accept multiples args
+func TrimSpace(inputString string, cmds ...string) (newstring string, err error) {
+
+	osForbiden := regexp.MustCompile(`[<>:"/\\|?*]`)
+	remInside := regexp.MustCompile(`[\s\p{Zs}]{2,}`)    //	to match 2 or more whitespace symbols inside a string
+	remInsideNoTab := regexp.MustCompile(`[\p{Zs}]{2,}`) //	(preserve \t) to match 2 or more space symbols inside a string
+
+	if len(cmds) != 0 {
+		for _, command := range cmds {
+			switch command {
+			case "+h": //	Escape html
+				inputString = html.EscapeString(inputString)
+			case "-h": //	UnEscape html
+				inputString = html.UnescapeString(inputString)
+			case "+e": //	Escape specials chars
+				inputString = fmt.Sprintf("%q", inputString)
+			case "-e": //	Un-Escape specials chars
+				tmpString, err := strconv.Unquote(`"` + inputString + `"`)
+				if err != nil {
+					return inputString, err
+				}
+				inputString = tmpString
+			case "-w": //	Change all illegals chars (for path in linux and windows) into "-"
+				inputString = osForbiden.ReplaceAllString(inputString, "-")
+			case "+w": //	clean all illegals chars (for path in linux and windows)
+				inputString = osForbiden.ReplaceAllString(inputString, "")
+			case "-c": //	Trim [[:space:]] and clean multi [[:space:]] inside
+				inputString = strings.TrimSpace(remInside.ReplaceAllString(inputString, " "))
+			case "-ct": //	Trim [[:space:]] and clean multi [[:space:]] inside (preserve TAB)
+				inputString = strings.Trim(remInsideNoTab.ReplaceAllString(inputString, " "), " ")
+			case "-s": //	To match 2 or more whitespace leading/ending/inside a string (include \t, \n)
+				inputString = strings.Join(strings.Fields(inputString), " ")
+			case "-&": //	Replace ampersand CHAR with ampersand HTML code
+				inputString = strings.Replace(inputString, "&", "&amp;", -1)
+			case "+&": //	Replace ampersand HTML code with ampersand CHAR
+				inputString = strings.Replace(inputString, "&amp;", "&", -1)
+			default:
+				return inputString, errors.New("TrimSpace, " + command + ", does not exist")
+			}
+		}
+	}
+	return inputString, nil
+}
+
+// CmpRemSl2d: Compare slice1 and slice2 if row exist on both,
+// the raw is removed from slice2 and result returned.
+func CmpRemSl2d(sl1, sl2 [][]string) (outSlice [][]string) {
+	var skip bool
+	for _, row2 := range sl2 {
+		for _, row1 := range sl1 {
+			if reflect.DeepEqual(row1, row2) {
+				skip = true
+				break
+			}
+		}
+		if !skip {
+			outSlice = append(outSlice, row2)
+		}
+		skip = false
+	}
+	return outSlice
+}
+
+// CmpRemSl2d: Compare slice1 and slice2 if row exist on both,
+// they will be returned.
+func CmpSl2d(sl1, sl2 [][]string) (outSlice []string) {
+	var joined string
+	for _, row2 := range sl2 {
+		for _, row1 := range sl1 {
+			if reflect.DeepEqual(row1, row2) {
+				joined = filepath.Join(row2[0], row2[1]) + row2[2]
+				if !IsExistSl(outSlice, joined) {
+					outSlice = append(outSlice, joined)
+				}
+			}
+		}
+	}
+	return outSlice
+}
+
+// CheckForDupSl2d: Return list of duplicated row is found
+func CheckForDupSl2d(sl [][]string) (outSlice []string) {
+	for idx := 0; idx < len(sl)-1; idx++ {
+		for secIdx := idx + 1; secIdx < len(sl); secIdx++ {
+			if reflect.DeepEqual(sl[idx], sl[secIdx]) {
+				outSlice = append(outSlice, filepath.Join(sl[secIdx][0], sl[secIdx][1])+sl[secIdx][2])
+			}
+		}
+	}
+	return outSlice
+}
+
+// IsExistSl: if exist then  ...
+func IsExistSl(slice []string, item string) bool {
+	for _, mainRow := range slice {
+		if mainRow == item {
+			return true
+		}
+	}
+	return false
 }
