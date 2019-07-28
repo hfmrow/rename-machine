@@ -1,7 +1,7 @@
 {
 	"ProgInfos": {
 		"Name": "renMachine",
-		"Version": "v1.4.3",
+		"Version": "v1.5",
 		"Creat": "H.F.M",
 		"MainObjStructName": "mainObjects",
 		"GladeXmlFilename": "/media/syndicate/storage/Documents/dev/go/src/github.com/hfmrow/renMachine/assets/glade/main.glade",
@@ -12,7 +12,7 @@
 		"LangNameShrt": "eng",
 		"Author": "H.F.M",
 		"Date": "Tue, 12 Mar 2019 23:08:25",
-		"Updated": "Thu, 25 Jul 2019 04:39:00",
+		"Updated": "Sun, 28 Jul 2019 07:03:01",
 		"Contributors": [
 			""
 		]
@@ -31,8 +31,8 @@
 			"Label": "",
 			"LabelMarkup": false,
 			"LabelWrap": false,
-			"Tooltip": "You can drop files here.",
-			"TooltipMarkup": false,
+			"Tooltip": "You can drop files here.\n\nBe aware of \u003cspan font_weight=\"bold\"\u003eextensions mask\u003c/span\u003e  when you drop files.",
+			"TooltipMarkup": true,
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
@@ -52,6 +52,19 @@
 			"Idx": 1
 		},
 		{
+			"Class": "GtkCheckButton",
+			"Id": "MoveCumulativeDndChk",
+			"Label": "Cumulative DnD",
+			"LabelMarkup": false,
+			"LabelWrap": false,
+			"Tooltip": "When checked, Dropped files will be added to the list.\nElse, files list will be cleared on each drop.",
+			"TooltipMarkup": false,
+			"Text": "",
+			"Uri": "",
+			"Comment": "",
+			"Idx": 2
+		},
+		{
 			"Class": "GtkEntry",
 			"Id": "MoveEntryExtMask",
 			"Label": "",
@@ -62,7 +75,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 2
+			"Idx": 3
 		},
 		{
 			"Class": "GtkFileChooserButton",
@@ -75,7 +88,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 3
+			"Idx": 4
 		},
 		{
 			"Class": "GtkLabel",
@@ -88,7 +101,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 4
+			"Idx": 5
 		},
 		{
 			"Class": "GtkTreeView",
@@ -101,7 +114,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 5
+			"Idx": 6
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -114,7 +127,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 6
+			"Idx": 7
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -127,7 +140,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 7
+			"Idx": 8
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -140,7 +153,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 8
+			"Idx": 9
 		},
 		{
 			"Class": "GtkEntry",
@@ -153,7 +166,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 9
+			"Idx": 10
 		},
 		{
 			"Class": "GtkEntry",
@@ -166,7 +179,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 10
+			"Idx": 11
 		},
 		{
 			"Class": "GtkImage",
@@ -179,7 +192,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 11
+			"Idx": 12
 		},
 		{
 			"Class": "GtkLabel",
@@ -192,7 +205,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 12
+			"Idx": 13
 		},
 		{
 			"Class": "GtkLabel",
@@ -205,7 +218,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 13
+			"Idx": 14
 		},
 		{
 			"Class": "GtkButton",
@@ -218,7 +231,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "Over window",
-			"Idx": 14
+			"Idx": 15
 		},
 		{
 			"Class": "GtkButton",
@@ -231,7 +244,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "Over window",
-			"Idx": 15
+			"Idx": 16
 		},
 		{
 			"Class": "GtkButton",
@@ -244,7 +257,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 16
+			"Idx": 17
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -257,7 +270,20 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 17
+			"Idx": 18
+		},
+		{
+			"Class": "GtkCheckButton",
+			"Id": "RenCumulativeDndChk",
+			"Label": "Cumulative DnD",
+			"LabelMarkup": false,
+			"LabelWrap": false,
+			"Tooltip": "When checked, Dropped files will be added to the list.\nElse, files list will be cleared on each drop.",
+			"TooltipMarkup": false,
+			"Text": "",
+			"Uri": "",
+			"Comment": "",
+			"Idx": 19
 		},
 		{
 			"Class": "GtkEntry",
@@ -270,7 +296,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 18
+			"Idx": 20
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -283,7 +309,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 19
+			"Idx": 21
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -296,7 +322,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 20
+			"Idx": 22
 		},
 		{
 			"Class": "GtkEntry",
@@ -309,7 +335,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 21
+			"Idx": 23
 		},
 		{
 			"Class": "GtkSpinButton",
@@ -322,7 +348,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 22
+			"Idx": 24
 		},
 		{
 			"Class": "GtkButton",
@@ -335,7 +361,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 23
+			"Idx": 25
 		},
 		{
 			"Class": "GtkLabel",
@@ -348,20 +374,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 24
-		},
-		{
-			"Class": "GtkButton",
-			"Id": "RenOrgSelButton",
-			"Label": "Restore the original files list",
-			"LabelMarkup": false,
-			"LabelWrap": false,
-			"Tooltip": "Restore the original files list passed by argument\nor with drag \u0026 drop.",
-			"TooltipMarkup": false,
-			"Text": "",
-			"Uri": "",
-			"Comment": "",
-			"Idx": 25
+			"Idx": 26
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -374,7 +387,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 26
+			"Idx": 27
 		},
 		{
 			"Class": "GtkTreeView",
@@ -387,7 +400,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 27
+			"Idx": 28
 		},
 		{
 			"Class": "GtkButton",
@@ -400,7 +413,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 28
+			"Idx": 29
 		},
 		{
 			"Class": "GtkEntry",
@@ -413,7 +426,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 29
+			"Idx": 30
 		},
 		{
 			"Class": "GtkEntry",
@@ -426,7 +439,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 30
+			"Idx": 31
 		},
 		{
 			"Class": "GtkEntry",
@@ -439,7 +452,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 31
+			"Idx": 32
 		},
 		{
 			"Class": "GtkEntry",
@@ -452,7 +465,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 32
+			"Idx": 33
 		},
 		{
 			"Class": "GtkEntry",
@@ -465,7 +478,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 33
+			"Idx": 34
 		},
 		{
 			"Class": "GtkEntry",
@@ -478,7 +491,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 34
+			"Idx": 35
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -491,7 +504,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 35
+			"Idx": 36
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -504,7 +517,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 36
+			"Idx": 37
 		},
 		{
 			"Class": "GtkButton",
@@ -517,7 +530,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 37
+			"Idx": 38
 		},
 		{
 			"Class": "GtkEntry",
@@ -530,7 +543,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 38
+			"Idx": 39
 		},
 		{
 			"Class": "GtkEntry",
@@ -543,7 +556,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 39
+			"Idx": 40
 		},
 		{
 			"Class": "GtkEntry",
@@ -556,7 +569,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 40
+			"Idx": 41
 		},
 		{
 			"Class": "GtkButton",
@@ -569,7 +582,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 41
+			"Idx": 42
 		},
 		{
 			"Class": "GtkEntry",
@@ -582,7 +595,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 42
+			"Idx": 43
 		},
 		{
 			"Class": "GtkImage",
@@ -595,7 +608,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 43
+			"Idx": 44
 		},
 		{
 			"Class": "GtkButton",
@@ -608,7 +621,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 44
+			"Idx": 45
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -621,7 +634,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 45
+			"Idx": 46
 		},
 		{
 			"Class": "GtkButton",
@@ -634,7 +647,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 46
+			"Idx": 47
 		},
 		{
 			"Class": "GtkButton",
@@ -643,19 +656,6 @@
 			"LabelMarkup": false,
 			"LabelWrap": false,
 			"Tooltip": "Display complete window instead of single entry.",
-			"TooltipMarkup": false,
-			"Text": "",
-			"Uri": "",
-			"Comment": "",
-			"Idx": 47
-		},
-		{
-			"Class": "GtkButton",
-			"Id": "TitlCopyListButton",
-			"Label": "Copy Files list",
-			"LabelMarkup": false,
-			"LabelWrap": false,
-			"Tooltip": "Transfering file list to edit window.",
 			"TooltipMarkup": false,
 			"Text": "",
 			"Uri": "",
@@ -715,6 +715,19 @@
 			"Idx": 52
 		},
 		{
+			"Class": "GtkCheckButton",
+			"Id": "TitleCumulativeDndChk",
+			"Label": "Cumulative DnD",
+			"LabelMarkup": false,
+			"LabelWrap": false,
+			"Tooltip": "When checked, Dropped files will be added to the list.\nElse, files list will be cleared on each drop.",
+			"TooltipMarkup": false,
+			"Text": "",
+			"Uri": "",
+			"Comment": "",
+			"Idx": 53
+		},
+		{
 			"Class": "GtkTreeView",
 			"Id": "TitlePrevTreeview",
 			"Label": "",
@@ -725,7 +738,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 53
+			"Idx": 54
 		},
 		{
 			"Class": "GtkCheckButton",
@@ -738,7 +751,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 54
+			"Idx": 55
 		},
 		{
 			"Class": "GtkEntry",
@@ -751,7 +764,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 55
+			"Idx": 56
 		},
 		{
 			"Class": "GtkSpinButton",
@@ -764,7 +777,7 @@
 			"Text": "",
 			"Uri": "",
 			"Comment": "",
-			"Idx": 56
+			"Idx": 57
 		},
 		{
 			"Class": "GtkTextView",
@@ -773,19 +786,6 @@
 			"LabelMarkup": false,
 			"LabelWrap": false,
 			"Tooltip": "",
-			"TooltipMarkup": false,
-			"Text": "",
-			"Uri": "",
-			"Comment": "",
-			"Idx": 57
-		},
-		{
-			"Class": "GtkButton",
-			"Id": "TitlOrgSelButton",
-			"Label": "Restore the original files list",
-			"LabelMarkup": false,
-			"LabelWrap": false,
-			"Tooltip": "Restore the original files list passed by argument\nor with drag \u0026 drop.",
 			"TooltipMarkup": false,
 			"Text": "",
 			"Uri": "",
@@ -809,14 +809,16 @@
 	"Sentences": {
 		"all": "All",
 		"allow": "Allow",
+		"alreadyExist": "Filename(s) already exists:",
 		"cancel": "Cancel",
 		"confirm": "Comfirmation !",
-		"coulnotproceed": "\nCould not proceed: \nSome filenames are duplicates.",
 		"deny": "Deny",
+		"dupFile": "\nDuplicate filename(s):",
 		"emptyname": "Empty filename",
 		"errDir": "Error reading directory content.",
 		"file": " file ? ",
 		"fileExist": ": file exists",
+		"filenameErr": "You got an issue with:\n",
 		"mstk": "A mistake ...",
 		"no": "No",
 		"none": "None",
