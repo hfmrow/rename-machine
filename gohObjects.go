@@ -1,8 +1,11 @@
 // gohObjects.go
 
-// Source file auto-generated on Sun, 28 Jul 2019 07:02:22 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
-
 /*
+	Source file auto-generated on Fri, 02 Apr 2021 14:58:19 using Gotk3 Objects Handler v1.7.5 ©2018-21 hfmrow
+	This software use gotk3 that is licensed under the ISC License:
+	https://github.com/gotk3/gotk3/blob/master/LICENSE
+
+	Copyright ©2018-21 hfmrow - Rename Machine v1.6.1 github.com/hfmrow/rename-machine
 	This program comes with absolutely no warranty. See the The MIT License (MIT) for details:
 	https://opensource.org/licenses/mit-license.php
 */
@@ -20,7 +23,6 @@ var mainObjects *MainControlsObj
 /* Main structure Declaration */
 /******************************/
 type MainControlsObj struct {
-	fileListstore              *gtk.ListStore /*MANUAL*/
 	FileListTreeview           *gtk.TreeView
 	mainUiBuilder              *gtk.Builder
 	MainWindow                 *gtk.Window
@@ -29,7 +31,6 @@ type MainControlsObj struct {
 	MoveEntryExtMask           *gtk.Entry
 	MoveFilechooserButton      *gtk.FileChooserButton
 	MoveLabelExtMask           *gtk.Label
-	moveListstore              *gtk.ListStore /*MANUAL*/
 	MovePrevTreeview           *gtk.TreeView
 	Notebook                   *gtk.Notebook
 	OverCaseSensChk            *gtk.CheckButton
@@ -56,7 +57,6 @@ type MainControlsObj struct {
 	RenIncSpinbutton           *gtk.SpinButton
 	RenKeepBtwButton           *gtk.Button
 	RenLabelExtMask            *gtk.Label
-	renListstore               *gtk.ListStore /*MANUAL*/
 	RenPresExtChk              *gtk.CheckButton
 	RenPrevTreeview            *gtk.TreeView
 	RenRegexButton             *gtk.Button
@@ -86,7 +86,6 @@ type MainControlsObj struct {
 	TitleAddBFileEntry         *gtk.Entry
 	TitleApplyButton           *gtk.Button
 	TitleCumulativeDndChk      *gtk.CheckButton
-	titleListstore             *gtk.ListStore /*MANUAL*/
 	TitlePrevTreeview          *gtk.TreeView
 	TitleScanSubDirChk         *gtk.CheckButton
 	TitleSepEntry              *gtk.Entry

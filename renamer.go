@@ -16,7 +16,11 @@ import (
 	"strconv"
 	"strings"
 
-	gi "github.com/hfmrow/renMachine/gtk3Import"
+	glss "github.com/hfmrow/genLib/slices"
+	glsscc "github.com/hfmrow/genLib/strings/cClass"
+
+	gidg "github.com/hfmrow/gtk3Import/dialog"
+	gitl "github.com/hfmrow/gtk3Import/tools"
 )
 
 func doRename(list *[][]string) {
@@ -48,55 +52,30 @@ func doRename(list *[][]string) {
 			List[idx] = []string{name[0], inList[idx], name[2]}
 		}
 	}
-	fillListstore(mainObjects.renListstore, List)
+	fillListstore(tvsRenam, List)
 }
 
 // Initialize modifName structure wth entry boxes
 func getEntryDatas() {
-	var entry string
-	var err error
+	//	osForbiden := regexp.MustCompile(`[<>:"/\\|?*]`)
+	osForbReplacement := "-"
 	// Remove
 	modifName.remove = modifName.remove[:0]
-	entry, err = mainObjects.RenRemEntry.GetText()
-	Check(err)
-	entry, _ = TrimSpace(entry, "-w")
-	modifName.remove = append(modifName.remove, entry)
-	entry, err = mainObjects.RenRemEntry1.GetText()
-	Check(err)
-	entry, _ = TrimSpace(entry, "-w")
-	modifName.remove = append(modifName.remove, entry)
-	entry, err = mainObjects.RenRemEntry2.GetText()
-	Check(err)
-	entry, _ = TrimSpace(entry, "-w")
-	modifName.remove = append(modifName.remove, entry)
+	modifName.remove = append(modifName.remove, OsForbiden(gitl.GetEntryText(mainObjects.RenRemEntry), osForbReplacement))
+	modifName.remove = append(modifName.remove, OsForbiden(gitl.GetEntryText(mainObjects.RenRemEntry1), osForbReplacement))
+	modifName.remove = append(modifName.remove, OsForbiden(gitl.GetEntryText(mainObjects.RenRemEntry2), osForbReplacement))
+
 	// Replace
 	modifName.replace = modifName.replace[:0]
-	entry, err = mainObjects.RenReplEntry.GetText()
-	Check(err)
-	entry, _ = TrimSpace(entry, "-w")
-	modifName.replace = append(modifName.replace, entry)
-	entry, err = mainObjects.RenReplEntry1.GetText()
-	Check(err)
-	entry, _ = TrimSpace(entry, "-w")
-	modifName.replace = append(modifName.replace, entry)
-	entry, err = mainObjects.RenReplEntry2.GetText()
-	Check(err)
-	entry, _ = TrimSpace(entry, "-w")
-	modifName.replace = append(modifName.replace, entry)
+	modifName.replace = append(modifName.replace, OsForbiden(gitl.GetEntryText(mainObjects.RenReplEntry), osForbReplacement))
+	modifName.replace = append(modifName.replace, OsForbiden(gitl.GetEntryText(mainObjects.RenReplEntry1), osForbReplacement))
+	modifName.replace = append(modifName.replace, OsForbiden(gitl.GetEntryText(mainObjects.RenReplEntry2), osForbReplacement))
+
 	// With
 	modifName.with = modifName.with[:0]
-	entry, err = mainObjects.RenWthEntry.GetText()
-	Check(err)
-	entry, _ = TrimSpace(entry, "-w")
-	modifName.with = append(modifName.with, entry)
-	entry, err = mainObjects.RenWthEntry1.GetText()
-	Check(err)
-	entry, _ = TrimSpace(entry, "-w")
-	modifName.with = append(modifName.with, entry)
-	entry, err = mainObjects.RenWthEntry2.GetText()
-	Check(err)
-	entry, _ = TrimSpace(entry, "-w")
-	modifName.with = append(modifName.with, entry)
+	modifName.with = append(modifName.with, OsForbiden(gitl.GetEntryText(mainObjects.RenWthEntry), osForbReplacement))
+	modifName.with = append(modifName.with, OsForbiden(gitl.GetEntryText(mainObjects.RenWthEntry1), osForbReplacement))
+	modifName.with = append(modifName.with, OsForbiden(gitl.GetEntryText(mainObjects.RenWthEntry2), osForbReplacement))
 }
 
 // Remove function
@@ -132,7 +111,7 @@ func substractIt(inStr, toSub string, caseSensitive, posixCC, posixCCStrictMode 
 			toSubReg, err = regexp.Compile(toSub)
 		}
 	} else {
-		toSubReg, err = regexp.Compile(StringToCharacterClasses(toSub, caseSensitive, posixCCStrictMode))
+		toSubReg, err = regexp.Compile(glsscc.StringToCharacterClasses(toSub, caseSensitive, posixCCStrictMode))
 	}
 	Check(err)
 	// Do the substract operation
@@ -148,7 +127,7 @@ func regexIt(inStr, regexStr, replWith string) (outStr string) {
 	outStr = inStr
 	regex, err := regexp.Compile(regexStr)
 	if err != nil {
-		gi.DlgMessage(mainObjects.MainWindow,
+		gidg.DialogMessage(mainObjects.MainWindow,
 			"error",
 			"Regex error !",
 			err.Error(),
@@ -176,8 +155,8 @@ func keepBetweenIt(inStr string, toRemove []string, caseSensitive, posixCC, posi
 			toKeepBtwReg, err = regexp.Compile(after + "(.*?)" + before)
 		}
 	} else {
-		toKeepBtwReg, err = regexp.Compile(StringToCharacterClasses(after,
-			caseSensitive, posixCCStrictMode) + "(.*?)" + StringToCharacterClasses(before,
+		toKeepBtwReg, err = regexp.Compile(glsscc.StringToCharacterClasses(after,
+			caseSensitive, posixCCStrictMode) + "(.*?)" + glsscc.StringToCharacterClasses(before,
 			caseSensitive, posixCCStrictMode))
 	}
 	Check(err)
@@ -200,12 +179,12 @@ func renameMe(from, to [][]string, fromTitle ...bool) (errList []string, err err
 	}
 
 	if title {
-		lengthTo = len(CmpRemSl2d(from, to))
+		lengthTo = len(glss.CmpRemSl2d(from, to))
 	} else {
 		lengthTo = len(from)
 	}
 
-	if len(from) >= lengthTo && gi.DlgMessage(mainObjects.MainWindow, "alert", sts["confirm"],
+	if len(from) >= lengthTo && gidg.DialogMessage(mainObjects.MainWindow, "alert", sts["confirm"],
 		"\n"+sts["proceed"]+strconv.Itoa(lengthTo)+sts["files"], "", sts["cancel"], sts["ok"]) == 1 {
 
 		for idx := 0; idx < lengthTo; idx++ {
@@ -214,7 +193,17 @@ func renameMe(from, to [][]string, fromTitle ...bool) (errList []string, err err
 				oldName = filepath.Join(from[idx][0], from[idx][1]+from[idx][2])
 				if oldName != newName {
 					if _, err = os.Stat(newName); !os.IsNotExist(err) {
+						// The case where samba is used over Window Os, when we have case sensitive
+						// comparison that say identical filename, we check for content to see if
+						// they're the same.
+
+						// if glco.Md5File(newName) == glco.Md5File(oldName) {
+						// 	if err = os.Rename(oldName, oldName+"~-~"); err == nil {
+						// 		err = os.Rename(oldName+"~-~", newName)
+						// 	}
+						// } else {
 						err = errors.New(newName + sts["fileExist"])
+						// }
 					} else {
 						err = os.Rename(oldName, newName)
 					}
@@ -239,11 +228,11 @@ func renameAndRefresh(from, to [][]string) {
 	var tmpSliceDup, tmpSliceExist []string
 	var tmp2dSl [][]string
 	if len(from) != 0 && len(to) != 0 {
-		// Check for iplucate or existing files.
-		tmpSliceDup = CheckForDupSl2d(to)
+		// Check for duplicate or existing files.
+		tmpSliceDup = CheckForDupSl2dReturnDup(to)
 		FindDir(to[0][0], []string{"*"}, &tmpSliceExist, false, false, false)
 		tmp2dSl = decomposeFileList(tmpSliceExist)
-		tmpSliceExist = CmpSl2d(tmp2dSl, to)
+		tmpSliceExist = CmpSl2dReturnDup(tmp2dSl, to)
 		if len(tmpSliceExist) != 0 {
 			outString = "\n" + sts["alreadyExist"] + "\n" + strings.Join(tmpSliceExist, "\n")
 		}
@@ -257,12 +246,12 @@ func renameAndRefresh(from, to [][]string) {
 				if err.Error() == errCancel {
 					return
 				}
-				gi.DlgMessage(mainObjects.MainWindow, "error", sts["mstk"],
+				gidg.DialogMessage(mainObjects.MainWindow, "error", sts["mstk"],
 					"\n"+sts["renErr"]+"\n"+err.Error()+"\n"+strings.Join(errList, "\n"),
 					"", sts["ok"])
 			} else {
 				if len(errList) != 0 {
-					gi.DlgMessage(mainObjects.MainWindow, "error", sts["mstk"],
+					gidg.DialogMessage(mainObjects.MainWindow, "error", sts["mstk"],
 						"\n"+sts["renErr"]+"\n"+strings.Join(errList, "\n"),
 						"", sts["ok"])
 				}
@@ -273,12 +262,12 @@ func renameAndRefresh(from, to [][]string) {
 					mainOptions.primeFilesList = append(mainOptions.primeFilesList, filepath.Join(file[0], file[1]+file[2]))
 				}
 				if err := resetEntriesAndReBuildTreeView(); err != nil {
-					gi.DlgMessage(mainObjects.MainWindow, "alert", sts["mstk"], sts["errFiles"], "", sts["ok"])
+					gidg.DialogMessage(mainObjects.MainWindow, "alert", sts["mstk"], sts["errFiles"], "", sts["ok"])
 				}
 			}
 		}
 	}
 	if len(outString) > 0 {
-		gi.DlgMessage(mainObjects.MainWindow, "alert", sts["mstk"], outString, "", sts["ok"])
+		gidg.DialogMessage(mainObjects.MainWindow, "alert", sts["mstk"], outString, "", sts["ok"])
 	}
 }

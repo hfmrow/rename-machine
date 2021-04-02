@@ -1,60 +1,76 @@
 // main.go
 
-// Source file auto-generated on Sun, 28 Jul 2019 07:02:22 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
-
 /*
-	RenameMachine v1.5 ©2018-19 H.F.M
+	Source file auto-generated on Fri, 02 Apr 2021 14:58:19 using Gotk3 Objects Handler v1.7.5 ©2018-21 hfmrow
+	This software use gotk3 that is licensed under the ISC License:
+	https://github.com/gotk3/gotk3/blob/master/LICENSE
 
+	Copyright ©2018-21 hfmrow - Rename Machine v1.6.1 github.com/hfmrow/rename-machine
 	This program comes with absolutely no warranty. See the The MIT License (MIT) for details:
-
-	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
-	associated documentation files (the "Software"), to dealin the Software without restriction,
-	including without limitation the rights to use, copy, modify, merge, publish, distribute,
-	sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions:
-
-	The above copyright notice and this permission notice shall be included in all copies or
-	substantial portions of the Software.
-
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
-	NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-	NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
-	OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+	https://opensource.org/licenses/mit-license.php
 */
 
 package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/gotk3/gotk3/gtk"
-	gi "github.com/hfmrow/renMachine/gtk3Import"
+
+	gidg "github.com/hfmrow/gtk3Import/dialog"
+	gimc "github.com/hfmrow/gtk3Import/misc"
+	gitw "github.com/hfmrow/gtk3Import/treeview"
 )
 
 func main() {
-	/* Be or not to be ... in dev mode ... */
+
+	/* Build options */
+
+	// devMode: is used in some functions to control the behavior of the program
+	// When software is ready to be published, this flag must be set at "false"
+	// that means:
+	// - options file will be stored in $HOME/.config/[Creat]/[softwareName],
+	// - translate function if used, will no more auto-update "sts" map sentences,
+	// - all built-in assets will be used instead of the files themselves.
+	//   Be aware to update assets via "Goh" and translations with "Got" before all.
 	devMode = true
 
-	/* Set to true when you choose using embedded assets functionality */
+	// Create temp directory .. or not
+	doTempDir = false
+
+	// Assets initialization according to the chosen mode (devMode).
 	assetsDeclarationsUseEmbedded(!devMode)
 
-	var multi bool
+	absoluteRealPath, optFilename = getAbsRealPath()
 
-	/* Init Options */
-	mainOptions = new(MainOpt)
-	mainOptions.Init()
+	/* Init & read options file */
+	mainOptions = new(MainOpt) // Assignate options' structure.
+	mainOptions.Read()
 
-	/* Read Options */
-	err = mainOptions.Read()
-	if err != nil {
-		fmt.Printf("%s\n%v\n", "Reading options error.", err)
-	}
+	/* Logger init. */
+	Logger = Log2FileStructNew(optFilename, devMode)
+	defer Logger.CloseLogger()
 
+	/* Init gtk display */
+	mainStartGtk(fmt.Sprintf("%s %s  %s %s %s",
+		mainOptions.About.AppName,
+		mainOptions.About.AppVers,
+		mainOptions.About.YearCreat,
+		mainOptions.About.AppCreats,
+		mainOptions.About.LicenseAbrv),
+		mainOptions.MainWinWidth,
+		mainOptions.MainWinHeight, true,
+		// If there is only 2 argument we start single file gui
+		len(os.Args) != 2)
+}
+
+func mainApplication() {
 	/*	Fill app infos	*/
-	mainOptions.AboutOptions.InitFillInfos(
+	mainOptions.About.InitFillInfos(
+		mainObjects.MainWindow,
 		"About "+Name,
 		Name,
 		Vers,
@@ -64,31 +80,19 @@ func main() {
 		LicenseShort,
 		Repository,
 		Descr,
-		renameMachine400x27,
+		"",
 		checked18x18)
 
-	if len(os.Args) != 2 {
-		multi = true
-	}
-
-	/* Init gtk display */
-	mainStartGtk(fmt.Sprintf("%s %s  %s %s %s",
-		mainOptions.AboutOptions.AppName,
-		mainOptions.AboutOptions.AppVers,
-		mainOptions.AboutOptions.YearCreat,
-		mainOptions.AboutOptions.AppCreats,
-		mainOptions.AboutOptions.LicenseAbrv),
-		mainOptions.MainWinWidth,
-		mainOptions.MainWinHeight, true, multi)
-}
-
-func mainApplication() {
 	/* Translate init. */
 	translate = MainTranslateNew(absoluteRealPath+mainOptions.LanguageFilename, devMode)
 
+	/* Command line arguments handling */
 	if len(os.Args) == 2 {
 		singleEntry = []string{filepath.Dir(os.Args[1]), BaseNoExt(filepath.Base(os.Args[1])), filepath.Ext(os.Args[1])}
-		if fileInfo, _ := os.Stat(os.Args[1]); fileInfo.IsDir() {
+		if fileInfo, err := os.Stat(os.Args[1]); os.IsNotExist(err) {
+			Check(err)
+			os.Exit(1)
+		} else if fileInfo.IsDir() {
 			// backup previous state of preserve extension in case of folder name modification
 			bakPresExt = mainOptions.PreserveExtSingle
 			mainOptions.PreserveExtSingle = false
@@ -114,50 +118,77 @@ func mainApplication() {
 	}
 
 	restorePrimeFilesList()
-	initTreeview()
-	refreshLists()
 
-	/* Init Spinbutton */
-	if ad, err := gtk.AdjustmentNew(0, 0, 65534, 1, 0, 0); err == nil {
-		mainObjects.RenIncSpinbutton.Configure(ad, 1, 0)
-	} else {
-		fmt.Println("Error on:", "RenIncSpinbutton", "Initialisation")
-	}
-	if ad, err := gtk.AdjustmentNew(0, 0, 30, 1, 0, 0); err == nil {
-		mainObjects.TitleSpinbutton.Configure(ad, 1, 0)
-	} else {
-		fmt.Println("Error on:", "TitleSpinbutton", "Initialisation")
+	if err = initSomeControls(); err == nil {
+
+		/* display files */
+		refreshLists()
+
+		/* Init Spinbutton */
+		if ad, err := gtk.AdjustmentNew(0, 0, 65534, 1, 0, 0); err == nil {
+			mainObjects.RenIncSpinbutton.Configure(ad, 1, 0)
+		} else {
+			fmt.Println("Error on:", "RenIncSpinbutton", "Initialisation")
+		}
+		if ad, err := gtk.AdjustmentNew(0, 0, 30, 1, 0, 0); err == nil {
+			mainObjects.TitleSpinbutton.Configure(ad, 1, 0)
+		} else {
+			fmt.Println("Error on:", "TitleSpinbutton", "Initialisation")
+		}
+
+		mainOptions.UpdateObjects(true)
 	}
 
-	mainOptions.UpdateObjects(true)
+	gidg.DialogError(mainObjects.MainWindow, sts["mstk"], sts["issueWith"], err, devMode, true)
+
 }
 
-func initTreeview() {
+func initSomeControls() (err error) {
 
 	// Drag & drop Init.
-	mainOptions.treeViewDropSet.InitDropSet(mainObjects.FileListTreeview, mainOptions.dndFilesList, receiveDnd)
+	mainOptions.treeViewDropSet = gimc.DragNDropNew(mainObjects.FileListTreeview, &mainOptions.dndFilesList, receiveDnd)
 
 	// Initialiste liststore Columns
-	var column *gtk.TreeViewColumn
-	mainObjects.fileListstore = gi.TreeViewListStoreSetup(mainObjects.FileListTreeview, false, oriFileListstoreCol, true)
-	// column = mainObjects.FileListTreeview.GetColumn(0)
-	// column.SetSortColumnID(0)
-	// column.SetSizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
-	// column = mainObjects.FileListTreeview.GetColumn(1)
-	// column.SetSizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+	if tvsFiles, err = gitw.TreeViewStructureNew(mainObjects.FileListTreeview, false, false); err == nil {
+		tvsFiles.AddColumns(oriFileListstoreCol, true, true, false, true, true, true)
+		if err = tvsFiles.StoreSetup(new(gtk.ListStore)); err == nil {
+			// For title function
+			if tvsTitle, err = gitw.TreeViewStructureNew(mainObjects.TitlePrevTreeview, false, false); err == nil {
+				tvsTitle.AddColumns(modFileListstoreCol, false, true, false, true, true, true)
+				if err = tvsTitle.StoreSetup(new(gtk.ListStore)); err == nil {
+					// For rename function
+					if tvsRenam, err = gitw.TreeViewStructureNew(mainObjects.RenPrevTreeview, false, false); err == nil {
+						tvsRenam.AddColumns(modFileListstoreCol, false, true, false, true, true, true)
+						if err = tvsRenam.StoreSetup(new(gtk.ListStore)); err == nil {
+							// For move file function
+							if tvsMoves, err = gitw.TreeViewStructureNew(mainObjects.MovePrevTreeview, false, false); err == nil {
+								tvsMoves.AddColumns(oriFileListstoreCol, false, true, false, true, true, true)
+								if err = tvsMoves.StoreSetup(new(gtk.ListStore)); err == nil {
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return
+}
 
-	// For title function
-	mainObjects.titleListstore = gi.TreeViewListStoreSetup(mainObjects.TitlePrevTreeview, false, modFileListstoreCol, false)
-	column = mainObjects.TitlePrevTreeview.GetColumn(0)
-	column.SetSortColumnID(-1)
-
-	// For rename function
-	mainObjects.renListstore = gi.TreeViewListStoreSetup(mainObjects.RenPrevTreeview, false, modFileListstoreCol, false)
-	column = mainObjects.RenPrevTreeview.GetColumn(0)
-	column.SetSortColumnID(-1)
-
-	// For move file function
-	mainObjects.moveListstore = gi.TreeViewListStoreSetup(mainObjects.MovePrevTreeview, false, oriFileListstoreCol, false)
-	column = mainObjects.MovePrevTreeview.GetColumn(0)
-	column.SetSortColumnID(-1)
+/*************************************\
+/* Executed just before closing all. */
+/************************************/
+func onShutdown() bool {
+	var err error
+	// Update mainOptions with GtkObjects and save it
+	if err = mainOptions.Write(); err == nil {
+		// What you want to execute before closing the app.
+		// Return:
+		// true for exit applicaton
+		// false does not exit application
+	}
+	if err != nil {
+		log.Fatalf("Unexpected error on exit: %s", err.Error())
+	}
+	return true
 }

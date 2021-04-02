@@ -11,7 +11,10 @@ import (
 	"strings"
 
 	"github.com/gotk3/gotk3/gtk"
-	gi "github.com/hfmrow/renMachine/gtk3Import"
+
+	glsg "github.com/hfmrow/genLib/strings"
+
+	gidg "github.com/hfmrow/gtk3Import/dialog"
 )
 
 // Notebook page changed
@@ -149,7 +152,7 @@ func MoveFilechooserButtonClicked() {
 		/* = append(mainOptions.primeFilesList,
 		filepath.Join(mainObjects.MoveFilechooserButton.GetFilename(), file[1]+file[2], file[3]))*/
 	}
-	fillListstore(mainObjects.moveListstore, mainOptions.moveFilesList, true)
+	fillListstore(tvsMoves, mainOptions.moveFilesList, true)
 }
 
 // Handling button for apply moving files
@@ -188,7 +191,7 @@ func TitleApplyButtonClicked() {
 			} else {
 				alertMessage = "\nTiteling alert.\nToo many titles\n\n"
 			}
-			value = gi.DlgMessage(mainObjects.MainWindow, "alert", "Attention !",
+			value = gidg.DialogMessage(mainObjects.MainWindow, "alert", "Attention !",
 				alertMessage+textFiles+textTitles+"\n\nProceed anyway ?",
 				"", "Cancel", "ok")
 		} else {
@@ -201,7 +204,7 @@ func TitleApplyButtonClicked() {
 					return
 				}
 				if !strings.Contains(err.Error(), errNbFileDoesNotMatch) {
-					gi.DlgMessage(mainObjects.MainWindow, "alert", "Attention !",
+					gidg.DialogMessage(mainObjects.MainWindow, "alert", "Attention !",
 						"\nTiteling error.\n"+err.Error()+"\n"+strings.Join(errList, "\n")+"\n", "", "ok")
 				}
 			}
@@ -234,15 +237,15 @@ func TitleApplyButtonClicked() {
 // Record TitleTextview content when focus out
 func TitleTextviewFocusOut() {
 	var newList []string
+
 	txtBuff, err := mainObjects.TitleTextview.GetBuffer()
 	Check(err)
 	txt, err := txtBuff.GetText(txtBuff.GetStartIter(), txtBuff.GetEndIter(), false)
 	Check(err)
-	mainOptions.titlList = strings.Split(txt, GetTextEOL([]byte(txt)))
+	mainOptions.titlList = strings.Split(txt, glsg.GetTextEOL([]byte(txt)))
 
 	for _, line := range mainOptions.titlList {
-		tmpStr, err := TrimSpace(line, "-c")
-		Check(err)
+		tmpStr := RemDblSpace(line)
 		if len(tmpStr) != 0 {
 			newList = append(newList, tmpStr)
 		}
@@ -251,28 +254,23 @@ func TitleTextviewFocusOut() {
 }
 
 // Handling TitleAddToFileEntryEvent
-func TitleAddToFileEntryEvent() {
-	textB, err := mainObjects.TitleAddBFileEntry.GetText()
+func TitleAddToFileEntryEvent(entry *gtk.Entry) {
+	textB, err := entry.GetText()
+	//	textB, err := mainObjects.TitleAddBFileEntry.GetText()
 	Check(err)
-	textB, err = TrimSpace(textB, "+w")
-	Check(err)
+	textB = OsForbiden(textB, "")
 	mainObjects.TitleAddBFileEntry.SetText(textB)
-
 	if len(textB) != 0 {
 		if len(mainOptions.titlFilenames) == 0 {
 			mainOptions.titlFilenames = make([][]string, len(mainOptions.orgFilenames))
 			copy(mainOptions.titlFilenames, mainOptions.orgFilenames)
 		}
-		// mainOptions.titlList = mainOptions.titlList[:0]
-		// for idx := 0; idx < len(mainOptions.titlFilenames); idx++ {
-		// 	mainOptions.titlList = append(mainOptions.titlList, textB)
-		// }
 	}
 	// Display modified titlefilelist
 	mainOptions.titlFilenames, _ = makeTitleFilename(mainOptions.orgFilenames,
 		mainOptions.titlList,
 		textB)
-	fillListstore(mainObjects.titleListstore, mainOptions.titlFilenames)
+	fillListstore(tvsTitle, mainOptions.titlFilenames)
 }
 
 // Copy filelist content to textview
@@ -297,39 +295,45 @@ func TitleEntryFocusOut() {
 	var tmpFinalList []string
 	strSep, err := mainObjects.TitleSepEntry.GetText()
 	Check(err)
+	mainObjects.TitleSepEntry.SetText(strSep)
+
 	strAddA, err := mainObjects.TitleAddAEntry.GetText()
 	Check(err)
+	mainObjects.TitleAddAEntry.SetText(OsForbiden(strAddA, ""))
+
 	strAddB, err := mainObjects.TitleAddBEntry.GetText()
 	Check(err)
+	mainObjects.TitleAddBEntry.SetText(OsForbiden(strAddB, ""))
+
 	spinVal := mainObjects.TitleSpinbutton.GetValueAsInt()
 
 	if len(strSep) != 0 {
 		for _, line := range mainOptions.titlList {
 			tmpStrSl := strings.Split(line, strSep)
 			if spinVal < len(tmpStrSl) {
-				// Sanitize entries and remove useless spaces
-				tmpStr, err := TrimSpace(tmpStrSl[spinVal], "-c", "-w")
-				Check(err)
-				tmpFinalList = append(tmpFinalList, strAddB+tmpStr+strAddA)
+				tmpStr := strings.Join(tmpStrSl[spinVal:], strSep)
+				tmpStr = strings.TrimSpace(OsForbiden(tmpStr, "-"))
+				tmpFinalList = append(tmpFinalList, OsForbiden(strAddB, "")+tmpStr+OsForbiden(strAddA, ""))
+				// tmpFinalList = append(tmpFinalList, strAddB+tmpStr+strAddA)
 			} else {
 				fmt.Println("field out of range")
+				mainObjects.TitleSpinbutton.SetValue(mainObjects.TitleSpinbutton.GetValue() - 1)
 			}
 		}
 	} else {
 		for _, line := range mainOptions.titlList {
-			tmpStr, err := TrimSpace(line, "-c", "-w")
-			Check(err)
-			tmpFinalList = append(tmpFinalList, strAddB+tmpStr+strAddA)
+			tmpStr := strings.TrimSpace(OsForbiden(line, "-"))
+			tmpFinalList = append(tmpFinalList, OsForbiden(strAddB, "")+tmpStr+OsForbiden(strAddA, ""))
 		}
 	}
 	mainOptions.titlList = tmpFinalList
 	// Display modified titlefilelist
 	mainOptions.titlFilenames, _ = makeTitleFilename(mainOptions.orgFilenames, mainOptions.titlList)
 
-	fillListstore(mainObjects.titleListstore, mainOptions.titlFilenames)
-	// Update Add before filname if entry exist
+	fillListstore(tvsTitle, mainOptions.titlFilenames)
 
-	TitleAddToFileEntryEvent()
+	// Update Add before filname if entry exist
+	TitleAddToFileEntryEvent(mainObjects.TitleAddBFileEntry)
 }
 
 // Renamer entry focus out
@@ -355,7 +359,7 @@ func RenKeepBtwButtonClicked() {
 	mainObjects.OverKeepAfterLbl.SetText("Keep After")
 	mainObjects.OverKeepAfterLbl.SetSizeRequest(100, 24)
 	mainObjects.OverKeepBeforeLbl.SetSizeRequest(100, 24)
-	setImage(mainObjects.OverImageTop, keepBetween48)
+	SetPict(mainObjects.OverImageTop, keepBetween48)
 
 	mainObjects.OverOkButton.Connect("clicked", func() {
 		txt, err := mainObjects.OverEntry.GetText()
@@ -403,7 +407,7 @@ func RenRegexButtonClicked() {
 	mainObjects.OverKeepAfterLbl.SetText("Regexp")
 	mainObjects.OverKeepAfterLbl.SetSizeRequest(100, 24)
 	mainObjects.OverKeepBeforeLbl.SetSizeRequest(100, 24)
-	setImage(mainObjects.OverImageTop, regex48x48)
+	SetPict(mainObjects.OverImageTop, regex48x48)
 
 	mainObjects.OverOkButton.Connect("clicked", func() {
 		regexStr, err := mainObjects.OverEntry.GetText()
@@ -443,7 +447,7 @@ func RenSubButtonClicked() {
 	mainObjects.OverKeepAfterLbl.SetText("To Substract")
 	mainObjects.OverKeepAfterLbl.SetSizeRequest(100, 24)
 	mainObjects.OverKeepBeforeLbl.SetSizeRequest(100, 24)
-	setImage(mainObjects.OverImageTop, substract48)
+	SetPict(mainObjects.OverImageTop, substract48)
 
 	mainObjects.OverOkButton.Connect("clicked", func() {
 		txt, err := mainObjects.OverEntry.GetText()
@@ -491,15 +495,15 @@ func SingleSwMultiButtonClicked() {
 	filename := filepath.Join(singleEntry[0], singleEntry[1]) + singleEntry[2]
 	fi, err := os.Stat(filename)
 	if err != nil {
-		gi.DlgMessage(mainObjects.MainWindow, "error", sts["mstk"],
-			"\n"+sts["filenameErr"],
+		gidg.DialogMessage(mainObjects.MainWindow, "error", sts["mstk"],
+			"\n"+sts["issueWith"],
 			"", sts["ok"])
 		return
 	}
 	if fi.IsDir() {
 		if err = FindDir(filename, mainOptions.ExtMaskRen, &mainOptions.primeFilesList,
 			mainOptions.ScanSubDir, mainOptions.ShowDirectory, true); err != nil {
-			gi.DlgMessage(mainObjects.MainWindow, "error", sts["mstk"], sts["\nerrDir\n"]+err.Error(), "", sts["ok"])
+			gidg.DialogMessage(mainObjects.MainWindow, "error", sts["mstk"], sts["\nerrDir\n"]+err.Error(), "", sts["ok"])
 		}
 	} else {
 		mainOptions.primeFilesList = append(mainOptions.primeFilesList, filename)
@@ -533,7 +537,7 @@ func SingleOkButtonClicked() {
 		}
 	}
 	if err != nil {
-		gi.DlgMessage(mainObjects.MainWindow, "error", "Attention !", "\nRenaming error: \n"+err.Error(), "", "ok")
+		gidg.DialogMessage(mainObjects.MainWindow, "error", "Attention !", "\nRenaming error: \n"+err.Error(), "", "ok")
 	} else {
 		windowDestroy()
 	}
@@ -558,8 +562,9 @@ func SinglePresExtChkClicked() {
 }
 
 func SingleEntryChanged() {
-	text, _ := mainObjects.SingleEntry.GetText()
-	text, _ = TrimSpace(text, "+w")
+	text, err := mainObjects.SingleEntry.GetText()
+	Check(err)
+	text = OsForbiden(text, "")
 	mainObjects.SingleEntry.SetText(text)
 }
 
@@ -599,5 +604,5 @@ func genericHideWindow(w *gtk.Window) bool {
 /* imgTop handler release signal (Display about box) */
 /*****************************************************/
 func imgTopReleaseEvent() {
-	mainOptions.AboutOptions.Show()
+	mainOptions.About.Show()
 }

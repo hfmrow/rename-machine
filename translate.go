@@ -1,12 +1,12 @@
 // translate.go
 
-// File generated on Sun, 28 Jul 2019 07:02:49 using Gotk3ObjectsTranslate v1.3 2019 H.F.M
+// File generated on Thu, 03 Dec 2020 02:37:36 using Gotk3 Objects Translate v1.5 2019-20 H.F.M
 
 /*
 * 	This program comes with absolutely no warranty.
 *	See the The MIT License (MIT) for details:
 *	https://opensource.org/licenses/mit-license.php
- */
+*/
 
 package main
 
@@ -15,9 +15,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
-	"regexp"
-	"sort"
 	"strings"
 
 	"github.com/gotk3/gotk3/gtk"
@@ -74,6 +71,7 @@ func (trans *MainTranslate) initGtkObjectsText() {
 	trans.setTextToGtkObjects(&mainObjects.SinglePresExtChk.Widget, "SinglePresExtChk")
 	trans.setTextToGtkObjects(&mainObjects.SingleResetButton.Widget, "SingleResetButton")
 	trans.setTextToGtkObjects(&mainObjects.SingleSwMultiButton.Widget, "SingleSwMultiButton")
+	trans.setTextToGtkObjects(&mainObjects.Statusbar.Widget, "Statusbar")
 	trans.setTextToGtkObjects(&mainObjects.TitleAddAEntry.Widget, "TitleAddAEntry")
 	trans.setTextToGtkObjects(&mainObjects.TitleAddBEntry.Widget, "TitleAddBEntry")
 	trans.setTextToGtkObjects(&mainObjects.TitleAddBFileEntry.Widget, "TitleAddBFileEntry")
@@ -86,7 +84,6 @@ func (trans *MainTranslate) initGtkObjectsText() {
 	trans.setTextToGtkObjects(&mainObjects.TitleTextview.Widget, "TitleTextview")
 	trans.setTextToGtkObjects(&mainObjects.TopImage.Widget, "TopImage")
 }
-
 // Translations structure declaration. To be used in main application.
 var translate = new(MainTranslate)
 
@@ -95,31 +92,32 @@ var translate = new(MainTranslate)
 // They'll be added to language file each time application started
 // when "devMode" is set at true.
 var sts = map[string]string{
-	`no`:        `No`,
-	`ok`:        `Ok`,
+	`deny`: `Deny`,
+	`renErr`: `Renaming error: `,
 	`emptyname`: `Empty filename`,
-	`file`:      ` file ? `,
-	`confirm`:   `Comfirmation !`,
-	`savef`:     `Save file`,
-	`cancel`:    `Cancel`,
-	`deny`:      `Deny`,
-	`allow`:     `Allow`,
-	`openf`:     `Open file`,
-	`errDir`:    `Error reading directory content.`,
-	`proceed`:   `Proceed with : `,
-	`renErr`:    `Renaming error: `,
-	`yes`:       `Yes`,
-	`retry`:     `Retry`,
-	`mstk`:      `A mistake ...`,
-	`filenameErr`: `You got an issue with:
+	`savef`: `Save file`,
+	`confirm`: `Comfirmation !`,
+	`all`: `All`,
+	`allow`: `Allow`,
+	`none`: `None`,
+	`issueWith`: `You got an issue with:
 `,
-	`none`:         `None`,
-	`all`:          `All`,
-	`fileExist`:    `: file exists`,
-	`alreadyExist`: `Filename(s) already exists:`,
+	`mstk`: `A mistake ...`,
+	`file`: ` file ? `,
+	`yes`: `Yes`,
 	`dupFile`: `
 Duplicate filename(s):`,
+	`errDir`: `Error reading directory content.`,
+	`cancel`: `Cancel`,
+	`openf`: `Open file`,
+	`alreadyExist`: `Filename(s) already exists:`,
+	`retry`: `Retry`,
+	`ok`: `Ok`,
+	`proceed`: `Proceed with : `,
+	`fileExist`: `: file exists`,
+	`no`: `No`,
 }
+
 
 // Translations structure with methods
 type MainTranslate struct {
@@ -137,9 +135,9 @@ type MainTranslate struct {
 // MainTranslateNew: Initialise new translation structure and assign language file content to GtkObjects.
 // devModeActive, indicate that the new sentences must be added to previous language file.
 func MainTranslateNew(filename string, devModeActive ...bool) (mt *MainTranslate) {
+	var err error
 	mt = new(MainTranslate)
-	if _, err := os.Stat(filename); err == nil {
-		mt.read(filename)
+	if err = mt.read(filename); err == nil {
 		mt.initGtkObjectsText()
 		if len(devModeActive) != 0 {
 			if devModeActive[0] {
@@ -151,30 +149,9 @@ func MainTranslateNew(filename string, devModeActive ...bool) (mt *MainTranslate
 			}
 		}
 	} else {
-		fmt.Printf("%s\n%s\n", "Error loading language file !\nNot an error when is just creating from glade Xml or GOH project file.", err.Error())
+		fmt.Printf("%s\n%s\n", "Error loading language file !\nNot an error when you just creating from glade Xml or GOH project file.", err.Error())
 	}
-	return mt
-}
-
-// sortId: sort by numbering methode
-func (trans *MainTranslate) sortId() {
-	var tmpWordList []string
-	for _, wrd := range trans.Objects {
-		tmpWordList = append(tmpWordList, wrd.Id)
-	}
-	numberedWords := new(WordWithDigit)
-	numberedWords.Init(tmpWordList)
-	sort.SliceStable(trans.Objects, func(i, j int) bool {
-		return numberedWords.FillWordToMatchMaxLength(trans.Objects[i].Id) < numberedWords.FillWordToMatchMaxLength(trans.Objects[j].Id)
-	})
-}
-
-// buildIdx: build index for each object.
-func (trans *MainTranslate) buildIdx() {
-	trans.sortId()
-	for idx, _ := range trans.Objects {
-		trans.Objects[idx].Idx = idx
-	}
+	return
 }
 
 // readFile: language file.
@@ -185,7 +162,7 @@ func (trans *MainTranslate) read(filename string) (err error) {
 			trans.objectsLoaded = true
 		}
 	}
-	return err
+	return
 }
 
 // Write json datas to file
@@ -197,63 +174,74 @@ func (trans *MainTranslate) write(filename string) (err error) {
 			err = ioutil.WriteFile(filename, out.Bytes(), 0644)
 		}
 	}
-	return err
+	return
 }
 
 type parsingFlags struct {
-	SkipLowerCase  bool
-	SkipEmptyLabel bool
-	SkipEmptyName  bool
-	DoBackup       bool
+	SkipLowerCase,
+	SkipEmptyLabel,
+	SkipEmptyName,
+	DoBackup bool
 }
 
 type progInfo struct {
-	Name              string
-	Version           string
-	Creat             string
-	MainObjStructName string
-	GladeXmlFilename  string
-	TranslateFilename string
+	Name,
+	Version,
+	Creat,
+	MainObjStructName,
+	GladeXmlFilename,
+	TranslateFilename,
+	ProjectRootDir,
+	GohProjFile string
 }
 
 type language struct {
-	LangNameLong string
-	LangNameShrt string
-	Author       string
-	Date         string
-	Updated      string
+	LangNameLong,
+	LangNameShrt,
+	Author,
+	Date,
+	Updated string
 	Contributors []string
 }
 
 type object struct {
-	Class         string
-	Id            string
-	Label         string
-	LabelMarkup   bool
-	LabelWrap     bool
-	Tooltip       string
+	Class,
+	Id,
+	Label,
+	Tooltip,
+	Text,
+	Uri,
+	Comment string
+	LabelMarkup,
+	LabelWrap,
 	TooltipMarkup bool
-	Text          string
-	Uri           string
-	Comment       string
-	Idx           int
+	Idx int
 }
 
 // Define available property within objects
 type propObject struct {
-	Class         string
-	Label         bool
-	LabelMarkup   bool
-	LabelWrap     bool
-	Tooltip       bool
-	TooltipMarkup bool
-	Text          bool
-	Uri           bool
+	Class string
+	Label,
+	LabelMarkup,
+	LabelWrap,
+	Tooltip,
+	TooltipMarkup,
+	Text,
+	Uri bool
 }
 
 // Property that exists for Gtk3 Object ...	(Used for Class capability)
 var propPerObjects = []propObject{
 	{Class: "GtkButton", Label: true, Tooltip: true, TooltipMarkup: true},
+	{Class: "GtkMenuButton", Label: true, Tooltip: true, TooltipMarkup: true},
+
+	// {Class: "GtkToolButton", Label: true, Tooltip: true, TooltipMarkup: true},    // Deprecated since 3.10
+	// {Class: "GtkImageMenuItem", Label: true, Tooltip: true, TooltipMarkup: true}, // Deprecated since 3.10
+
+	{Class: "GtkMenuItem", Label: true, Tooltip: true, TooltipMarkup: true},
+	{Class: "GtkCheckMenuItem", Label: true, Tooltip: true, TooltipMarkup: true},
+	{Class: "GtkRadioMenuItem", Label: true, Tooltip: true, TooltipMarkup: true},
+
 	{Class: "GtkToggleButton", Label: true, Tooltip: true, TooltipMarkup: true},
 	{Class: "GtkLabel", Label: true, LabelMarkup: true, Tooltip: true, TooltipMarkup: true, LabelWrap: true},
 	{Class: "GtkSpinButton", Tooltip: true, TooltipMarkup: true},
@@ -270,6 +258,9 @@ var propPerObjects = []propObject{
 	{Class: "GtkTreeView", Tooltip: true, TooltipMarkup: true},
 	{Class: "GtkFileChooserButton", Tooltip: true, TooltipMarkup: true},
 	{Class: "GtkTextView", Tooltip: true, TooltipMarkup: true},
+	{Class: "GtkSourceView", Tooltip: true, TooltipMarkup: true},
+	{Class: "GtkStatusbar", Tooltip: true, TooltipMarkup: true},
+	{Class: "GtkScrolledWindow", Tooltip: true, TooltipMarkup: true},
 }
 
 // setTextToGtkObjects: read translations from structure and set them to object.
@@ -301,86 +292,10 @@ func (trans *MainTranslate) setTextToGtkObjects(obj *gtk.Widget, objectId string
 					if props.Uri {
 						obj.SetProperty("uri", currObject.Uri)
 					}
+					break
 				}
 			}
+			break
 		}
 	}
-}
-
-// Digit sorting functions
-type WordWithDigit struct {
-	maxLength, maxLengthLeft int
-	zeroMask                 string
-	ForceRightDigit          bool
-}
-
-func (w *WordWithDigit) Init(words []string) {
-	for _, word := range words {
-		if len(word) > w.maxLength {
-			w.maxLength = len(word)
-			if digitsPosition(word) == 0 {
-				digits := getDigits(word)
-				if len(digits) > w.maxLengthLeft {
-					w.maxLengthLeft = len(digits)
-				}
-			}
-		}
-	}
-}
-
-// FillWordToMatchMaxLength: Convert word(s) into numbered one, like "label1" -> "label000001" etc...
-// results are based on list of words that determine max length of them to determinate
-// the final length of the modified word. This is used in case of sorting list
-// of words that contains numeric value to avoid the disorder result
-// like "1label", "10label", "2label" etc ...
-func (w *WordWithDigit) FillWordToMatchMaxLength(inString string) (outString string) {
-	var word string
-
-	inString = strings.ToLower(strings.TrimSpace(inString))
-	zeroCount := w.maxLength - len(inString)
-	for idx := 0; idx < zeroCount; idx++ {
-		w.zeroMask += "0"
-	}
-	wordPos := digitsPosition(inString)
-	digits := getDigits(inString)
-	switch wordPos {
-	case 0: // Left
-		word = inString[len(digits):len(inString)]
-		outString = word + w.zeroMask + digits
-	case 1: // Right
-		word = inString[:len(inString)-len(digits)]
-		outString = word + w.zeroMask + digits
-	case -1: // None
-		outString = inString + w.zeroMask
-	}
-	w.zeroMask = ""
-	return outString
-}
-
-// numPosition: detect position of digit part: 0=left, 1=right, -1=none
-func digitsPosition(inString string) int {
-	digitS := regexp.MustCompile("^[[:digit:]]")
-	digitE := regexp.MustCompile("[[:digit:]]$")
-	switch {
-	case digitS.MatchString(inString):
-		return 0 // Left
-	case digitE.MatchString(inString):
-		return 1 // Right
-	}
-	return -1 // None
-}
-
-// getDigits: return digit part of string prior at start or at end, -1=none
-func getDigits(inString string) (value string) {
-	digitS := regexp.MustCompile("(^[0-9]*)")
-	digitE := regexp.MustCompile("([0-9]*$)")
-	start := digitS.FindString(inString)
-	end := digitE.FindString(inString)
-	switch {
-	case len(start) != 0: // Left
-		value = start
-	case len(end) != 0: // Right
-		value = end
-	}
-	return value
 }

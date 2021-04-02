@@ -1,8 +1,11 @@
 // gohSignals.go
 
-// Source file auto-generated on Sun, 28 Jul 2019 07:02:22 using Gotk3ObjHandler v1.3.6 ©2019 H.F.M
-
 /*
+	Source file auto-generated on Fri, 02 Apr 2021 14:58:19 using Gotk3 Objects Handler v1.7.5 ©2018-21 hfmrow
+	This software use gotk3 that is licensed under the ISC License:
+	https://github.com/gotk3/gotk3/blob/master/LICENSE
+
+	Copyright ©2018-21 hfmrow - Rename Machine v1.6.1 github.com/hfmrow/rename-machine
 	This program comes with absolutely no warranty. See the The MIT License (MIT) for details:
 	https://opensource.org/licenses/mit-license.php
 */
@@ -19,7 +22,6 @@ func signalsPropHandler() {
 	mainObjects.MoveEntryExtMask.Connect("activate", MoveEntryExtMaskEnterKeyPressed)
 	mainObjects.MoveEntryExtMask.Connect("focus-out-event", MoveEntryExtMaskEnterKeyPressed)
 	mainObjects.MoveFilechooserButton.Connect("selection-changed", MoveFilechooserButtonClicked)
-	mainObjects.MoveLabelExtMask.Connect("notify", blankNotify)
 	mainObjects.Notebook.Connect("switch-page", NotebookPageChanged)
 	mainObjects.OverCaseSensChk.Connect("clicked", OverCaseSensChkChanged)
 	mainObjects.OverCharClassChk.Connect("clicked", OverCharClassChkChanged)
@@ -34,7 +36,6 @@ func signalsPropHandler() {
 	mainObjects.RenIncSepEntry.Connect("changed", RenRemEntryFocusOut)
 	mainObjects.RenIncSpinbutton.Connect("value-changed", RenRemEntryFocusOut)
 	mainObjects.RenKeepBtwButton.Connect("clicked", RenKeepBtwButtonClicked)
-	mainObjects.RenLabelExtMask.Connect("notify", blankNotify)
 	mainObjects.RenPresExtChk.Connect("clicked", RenPresExtChkChanged)
 	mainObjects.RenRegexButton.Connect("clicked", RenRegexButtonClicked)
 	mainObjects.RenRemEntry.Connect("changed", RenRemEntryFocusOut)
@@ -58,7 +59,6 @@ func signalsPropHandler() {
 	mainObjects.SingleSwMultiButton.Connect("clicked", SingleSwMultiButtonClicked)
 	mainObjects.TitleAddAEntry.Connect("changed", TitleEntryFocusOut)
 	mainObjects.TitleAddBEntry.Connect("changed", TitleEntryFocusOut)
-	// mainObjects.TitleAddBFileEntry.Connect("focus-out-event", TitleAddToFileEntryEvent)
 	mainObjects.TitleAddBFileEntry.Connect("changed", TitleAddToFileEntryEvent)
 	mainObjects.TitleApplyButton.Connect("clicked", TitleApplyButtonClicked)
 	mainObjects.TitleCumulativeDndChk.Connect("clicked", CumulativeDndChkClicked)
