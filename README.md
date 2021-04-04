@@ -68,8 +68,6 @@ Take a look [here, H.F.M repositories](https://github.com/hfmrow/) for other use
 
 ## How to compile
 
-- 
-
 - Open terminal window and at command prompt, type: `go get github.com/hfmrow/rename-machine`
 
 - See [Gotk3 Installation instructions](https://github.com/gotk3/gotk3/wiki#installation) for gui installation instruction.
