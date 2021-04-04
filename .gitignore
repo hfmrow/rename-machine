@@ -28,6 +28,7 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+.vscode/*
 
 # Personal unwanted files and folders
 gohBackup/*
@@ -42,4 +43,4 @@ assets/artWork/*
 *.SUM
 *.desktop
 git-push.sh
-
+*.code-workspace

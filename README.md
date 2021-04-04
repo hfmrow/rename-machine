@@ -6,7 +6,7 @@
 
 Take a look [here, H.F.M repositories](https://github.com/hfmrow/) for other useful linux softwares.
 
-- If you just want to use it, simply download the '*.deb' compiled version under the "release" tab.
+- If you just want to use it, simply download the '*.deb' compiled version under the [Releases](https://github.com/hfmrow/rename-machine/releases) tab.
 
 - If you want to play inside code, see below "How to compile" section.
 
@@ -36,27 +36,27 @@ Take a look [here, H.F.M repositories](https://github.com/hfmrow/) for other use
 ## Some pictures and explanations
 
 **Single entry window.**  
-![loading-ag-6060](assets/readme/single-entry.jpg "Single entry window.")  
+![](assets/readme/single-entry.jpg) 
 
 **This is the main screen.**  
-![loading-ag-6062](assets/readme/mainScr-rename-engine.jpg "Main")  
+![](assets/readme/mainScr-rename-engine.jpg)  
 
 **Remove & Replace multiples patterns.**  
-![loading-ag-6058](assets/readme/ren-repl.jpg "Remove & Replace")  
+![](assets/readme/ren-repl.jpg)  
 
 **Add incremental numbers to file names.**  
-![loading-ag-6056](assets/readme/inc.jpg "incremental numbers")  
+![](assets/readme/inc.jpg)  
 
 **The keep between window**  
-![loading-ag-6054](assets/readme/keep-btw1.jpg "keep between")  
+![](assets/readme/keep-btw1.jpg)  
 
 **Keep between.**  
 *Applied using posix [character classes](https://www.regular-expressions.info/posixbrackets.html)  option. By this way, numeric values "00,01,02,03,..." will always matching for replacement or removing.*  
-![loading-ag-6052](/media/syndicate/storage/Documents/dev/go/src/github.com/hfmrow/rename-machine/assets/readme/keep-btw2.jpg "Keep between.")  
+![](assets/readme/keep-btw2.jpg)  
 
 **Using regular expression to replace pattern.**  
 *In this case, (\i) means to be case insensitive context, between parentheses, there is the pattern to find (upper and lower cases), the dot "." means any single character, and "[[:digit:]]" for any single number "0-9" in posix [character classes](https://www.regular-expressions.info/posixbrackets.html) notation.*  
-![](/media/syndicate/storage/Documents/dev/go/src/github.com/hfmrow/rename-machine/assets/readme/regex-1.jpg)  
+![](assets/readme/regex-1.jpg)  
 
  **Subtraction pattern using posix**[ Character classes](https://www.regular-expressions.info/posixbrackets.html).  
 *Useful for series or audio files. The (**1** entry) will be internally transformed into ([[:upper:]][[:upper:]][[:upper:]][[:upper:]][[:space:]][[:digit:]][[:digit:]]) full (**2** character class compliant), using (**3** strict mode)*  
@@ -80,15 +80,19 @@ Take a look [here, H.F.M repositories](https://github.com/hfmrow/) for other use
 
 - To Produce a stand-alone executable, you must change inside "main.go" file:
   
-        func main() {
-            devMode = true
-        ...
+  ```go
+    func main() {
+        devMode = true
+    ...
+  ```
   
   into
   
-        func main() {
-            devMode = false
-        ...
+  ```go
+    func main() {
+        devMode = false
+    ...
+  ```
 
 This operation indicate that externals data (Image/Icons) must be embedded into the executable file.
 
