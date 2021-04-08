@@ -1,6 +1,6 @@
 # Rename Machine 1.6.1
 
-*This program is designed to rename/cleaning filenames, adding titles (from a list) and provide specific tag insertion and moving files contained in multi directories to a single folder ... lot of options available (regex, Posix character classes, case sensitive, keep between, extract, titling).*
+*Linux software designed to rename/cleaning filenames, adding titles (from a list) and provide specific tag insertion and moving files contained in multi directories to a single folder ... lot of available options (regex, Posix character classes, case sensitive, keep between, extract).*
 
 #### Last update 2021-04-02
 
